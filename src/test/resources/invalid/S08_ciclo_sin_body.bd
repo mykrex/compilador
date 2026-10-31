@@ -1,0 +1,8 @@
+// S08: while con un estatuto suelto (sintaxis del diagrama original);
+//      con la modificación, el ciclo exige un body entre llaves
+program _Error_ ;
+var _X_ : int;
+main {
+    while (_X_ != 0) do _X_ = _X_ - 1; ;
+}
+end

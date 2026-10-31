@@ -1,0 +1,7 @@
+// S12: Variables declaradas después de las funciones;
+//      el orden obligatorio es: var -> funciones -> main
+program _Error_ ;
+void _F_() [ { } ];
+var _X_ : int;
+main { }
+end

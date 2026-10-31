@@ -1,0 +1,8 @@
+// S09: if-else sin el ';' que cierra la condición
+program _Error_ ;
+var _X_ : int;
+main {
+    if (_X_ > 0) { _X_ = 1; } else { _X_ = 2; }
+    print(_X_);
+}
+end

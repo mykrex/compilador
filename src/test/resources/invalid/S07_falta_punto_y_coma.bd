@@ -1,0 +1,8 @@
+// S07: Falta ';' al final de una asignacion
+program _Error_ ;
+var _X_ : int;
+main {
+    _X_ = 5
+    print(_X_);
+}
+end

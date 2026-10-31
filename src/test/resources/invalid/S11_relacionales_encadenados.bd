@@ -1,0 +1,8 @@
+// S11: Dos operadores relacionales en una misma expresión;
+//      la gramática solo permite uno: exp (relOp exp)?
+program _Error_ ;
+var _A_, _B_, _C_ : int;
+main {
+    if (_A_ < _B_ < _C_) { print("orden"); };
+}
+end

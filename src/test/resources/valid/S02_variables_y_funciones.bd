@@ -1,0 +1,26 @@
+// S02: Variables globales, función void sin parámetros y función int
+//      con parámetros, variables locales y return con/sin expresión
+program _Funciones_ ;
+var _A_, _B_ : int;
+    _Prom_ : float;
+
+void _Saluda_() [
+    {
+        print("hola");
+        return;
+    }
+];
+
+int _Suma_(_X_ : int, _Y_ : int) [
+    var _R_ : int;
+    {
+        _R_ = _X_ + _Y_;
+        return _R_;
+    }
+];
+
+main {
+    _Saluda_();
+    _A_ = _Suma_(1, 2);
+}
+end

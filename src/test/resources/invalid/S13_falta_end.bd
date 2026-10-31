@@ -1,0 +1,5 @@
+// S13: Falta la palabra reservada 'end' al final del programa
+program _Error_ ;
+main {
+    print("sin fin");
+}

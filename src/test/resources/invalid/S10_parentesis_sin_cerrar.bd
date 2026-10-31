@@ -1,0 +1,7 @@
+// S10: Expresión con paréntesis sin cerrar
+program _Error_ ;
+var _X_, _A_ : int;
+main {
+    _X_ = (_A_ + 2 * 3;
+}
+end
