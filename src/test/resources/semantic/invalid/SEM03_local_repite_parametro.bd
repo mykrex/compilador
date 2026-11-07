@@ -1,0 +1,9 @@
+// SEM03 · Una variable local con el mismo nombre que un parámetro (D-34).
+// esperado: _X_ ya fue declarado en la función _F_
+program _Param_;
+void _F_(_X_ : int) [
+    var _X_ : float;
+    { }
+];
+main { }
+end

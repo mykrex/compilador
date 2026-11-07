@@ -1,0 +1,7 @@
+// SEM02 · Una variable global declarada dos veces (D-35).
+// esperado: la variable _A_ ya fue declarada
+program _Dup_;
+var _A_ : int;
+    _A_ : float;
+main { }
+end

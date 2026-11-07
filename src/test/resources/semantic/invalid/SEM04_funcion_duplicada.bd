@@ -1,0 +1,7 @@
+// SEM04 · Dos funciones con el mismo nombre (D-35).
+// esperado: la función _F_ ya fue declarada
+program _DupFunc_;
+void _F_() [ { } ];
+int _F_(_A_ : int) [ { return _A_; } ];
+main { }
+end

@@ -1,0 +1,32 @@
+// SEM01 · Declaraciones válidas: globales de ambos tipos, parámetros, locales,
+// el mismo nombre local (_I_) en dos funciones y una función que se llama a sí misma.
+program _Declaraciones_;
+var _Total_, _N_ : int;
+    _Prom_ : float;
+
+int _Fact_(_K_ : int) [
+    var _I_ : int;
+    {
+        _I_ = _K_;
+        if (_K_ < 2) {
+            return 1;
+        };
+        return _K_ * _Fact_(_K_ - 1);
+    }
+];
+
+void _Muestra_(_V_ : float) [
+    var _I_ : int;
+    {
+        _I_ = 0;
+        print("valor: ", _V_);
+    }
+];
+
+main {
+    _N_ = 5;
+    _Total_ = _Fact_(_N_);
+    _Prom_ = _Total_ / 2;
+    _Muestra_(_Prom_);
+}
+end
