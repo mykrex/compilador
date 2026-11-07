@@ -1,0 +1,16 @@
+// S05: while, read, print con varios elementos (letreros y expresiones)
+//      y bloque de estatutos con corchetes (incluido uno vacío)
+program _Ciclo_ ;
+var _N_, _I_ : int;
+main {
+    read(_N_);
+    _I_ = 0;
+    while (_I_ < _N_) do {
+        print("i =", _I_, "doble:", _I_ * 2);
+        [
+            _I_ = _I_ + 1;
+        ]
+    };
+    [ ]
+}
+end

@@ -8,8 +8,8 @@ import java.util.Map;
 /**
  * Tabla de variables de un alcance (global o una función)
  *
- * <p>Se implementa con {@code LinkedHashMap} : búsqueda e inserción O(1) por nombre,
- * como un {@code HashMap}, y además conserva el orden de declaración al recorrerla.</p>
+ * Se implementa con {@code LinkedHashMap} : búsqueda e inserción O(1) por nombre,
+ * como un {@code HashMap}, y además conserva el orden de declaración al recorrerla
  */
 public final class VariableTable {
 

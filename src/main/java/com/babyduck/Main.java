@@ -10,7 +10,7 @@ import java.util.List;
  * Punto de entrada del compilador BabyDuck.
  *
  * Uso:
- *   java com.babyduck.Main programa.bd            analiza léxico + sintaxis
+ *   java com.babyduck.Main programa.bd            analiza léxico + sintaxis + semántica
  *   java com.babyduck.Main programa.bd --tokens   además imprime la lista de tokens
  */
 public class Main {
@@ -27,11 +27,14 @@ public class Main {
             printTokens(path);
         }
 
-        BabyDuckAnalyzer.Result result = BabyDuckAnalyzer.analyze(CharStreams.fromFileName(path));
+        BabyDuckAnalyzer.Result result = BabyDuckAnalyzer.compile(CharStreams.fromFileName(path));
 
         if (result.isValid()) {
             System.out.println("Programa válido: " + path);
             System.out.println(result.tree().toStringTree(result.parser()));
+            System.out.println();
+            System.out.println("=== Directorio de funciones ===");
+            System.out.println(result.directory());
         } else {
             System.out.println("Se encontraron " + result.errors().size() + " error(es) en " + path + ":");
             result.errors().forEach(e -> System.out.println("  " + e));

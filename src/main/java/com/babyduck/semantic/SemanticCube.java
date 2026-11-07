@@ -6,15 +6,15 @@ import java.util.Map;
 /**
  * Cubo semántico
  *
- * <p>Estructura: {@code EnumMap<Type, EnumMap<Op, EnumMap<Type, Type>>>}, es decir
+ * Estructura: {@code EnumMap<Type, EnumMap<Op, EnumMap<Type, Type>>>}, es decir
  * tipo izquierdo → operador → tipo derecho → tipo resultante
  *
  * Cualquier combinación que no esté registrada devuelve {@link Type#ERROR}; así,
  * {@code BOOL} en aritmética y {@code VOID} en cualquier expresión quedan rechazados
- * sin escribir reglas adicionales.</p>
+ * sin escribir reglas adicionales
  *
- * <p>Para {@code ASSIGN}, el tipo izquierdo es el <b>destino</b> y el derecho el <b>valor</b>;
- * si la asignación es válida, el resultado es el tipo del destino.</p>
+ * Para {@code ASSIGN}, el tipo izquierdo es el 'destino' y el derecho el 'valor';
+ * si la asignación es válida, el resultado es el tipo del destino
  */
 public final class SemanticCube {
 

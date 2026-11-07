@@ -7,14 +7,12 @@ import java.util.List;
 /**
  * Entrada del directorio de funciones.
  *
- * <p>Cada parámetro se referencia desde dos lugares:</p>
- * <ul>
- *   <li>{@code params}: lista ordenada, para validar llamadas por posición
- *       (número de argumentos y tipo de cada uno)</li>
- *   <li>{@code locals}: tabla de la función, para buscarlo por nombre dentro del cuerpo
- *       y detectar si una variable local repite su nombre</li>
- * </ul>
- * <p>Ambas guardan el <b>mismo objeto</b> {@link VariableInfo}, no una copia</p>
+ * Cada parámetro se referencia desde dos lugares:
+ *  -{@code params}: lista ordenada, para validar llamadas por posición
+ *       (número de argumentos y tipo de cada uno)
+ *  -{@code locals}: tabla de la función, para buscarlo por nombre dentro del cuerpo
+ *       y detectar si una variable local repite su nombre
+ * Ambas guardan el "mismo objeto" {@link VariableInfo}, no una copia
  */
 public final class FunctionInfo {
 

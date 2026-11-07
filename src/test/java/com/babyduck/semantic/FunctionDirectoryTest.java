@@ -68,6 +68,21 @@ class FunctionDirectoryTest {
         assertNull(dir.lookupVariable("_X_", f));                        // no declarada
     }
 
+    /** Programa, globales y funciones comparten un solo espacio de nombres */
+    @Test
+    void globalUseReportsWhatOccupiesAName() {
+        FunctionDirectory dir = new FunctionDirectory();
+        dir.setProgramName("_Calc_");
+        dir.globals().add(new VariableInfo("_G_", Type.INT));
+        dir.addFunction(suma());
+
+        assertEquals(FunctionDirectory.NameKind.PROGRAM, dir.globalUse("_Calc_"));
+        assertEquals(FunctionDirectory.NameKind.GLOBAL_VARIABLE, dir.globalUse("_G_"));
+        assertEquals(FunctionDirectory.NameKind.FUNCTION, dir.globalUse("_Suma_"));
+        assertNull(dir.globalUse("_C_"));    // las locales de una función no ocupan nombres globales
+        assertNull(dir.globalUse("_Libre_"));
+    }
+
     @Test
     void functionsKeepDeclarationOrder() {
         FunctionDirectory dir = new FunctionDirectory();

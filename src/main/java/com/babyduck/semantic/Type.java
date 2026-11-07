@@ -1,14 +1,13 @@
 package com.babyduck.semantic;
 
 /**
- * Tipos internos del compilador (D-23).
+ * Tipos internos del compilador
  *
- * <ul>
- *   <li>{@code INT}, {@code FLOAT}: tipos declarables por el programador.</li>
- *   <li>{@code BOOL}: solo existe como resultado de {@code > < == !=}; no se puede declarar.</li>
- *   <li>{@code VOID}: tipo de retorno de funciones sin valor; nunca es válido dentro de una expresión.</li>
- *   <li>{@code ERROR}: resultado de cualquier combinación inválida en el cubo semántico.</li>
- * </ul>
+ * {@code INT}, {@code FLOAT}: tipos declarables por el programador
+ * {@code BOOL}: solo existe como resultado de {@code > < == !=}; no se puede declarar
+ * {@code VOID}: tipo de retorno de funciones sin valor; nunca es válido dentro de una expresión
+ * {@code ERROR}: resultado de cualquier combinación inválida en el cubo semántico
+ *
  */
 public enum Type {
     INT,

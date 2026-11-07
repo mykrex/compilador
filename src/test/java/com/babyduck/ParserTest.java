@@ -22,7 +22,7 @@ class ParserTest {
 
     @TestFactory
     Stream<DynamicTest> validPrograms() throws Exception {
-        return casesIn("/valid").map(file -> DynamicTest.dynamicTest(name(file), () -> {
+        return casesIn("/sintax/valid").map(file -> DynamicTest.dynamicTest(name(file), () -> {
             BabyDuckAnalyzer.Result result = BabyDuckAnalyzer.analyze(CharStreams.fromPath(file));
             assertTrue(result.isValid(), () -> "Errores inesperados: " + result.errors());
         }));
@@ -30,7 +30,7 @@ class ParserTest {
 
     @TestFactory
     Stream<DynamicTest> invalidPrograms() throws Exception {
-        return casesIn("/invalid").map(file -> DynamicTest.dynamicTest(name(file), () -> {
+        return casesIn("/sintaxis/invalid").map(file -> DynamicTest.dynamicTest(name(file), () -> {
             BabyDuckAnalyzer.Result result = BabyDuckAnalyzer.analyze(CharStreams.fromPath(file));
             assertFalse(result.isValid(), "Se esperaba al menos un error");
             assertEquals(ErrorCollector.Kind.SINTACTICO, result.errors().get(0).kind());

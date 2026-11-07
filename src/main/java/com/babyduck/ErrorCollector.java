@@ -10,26 +10,30 @@ import java.util.List;
 
 /**
  * Recolecta los errores del lexer y del parser en una lista,
- * en lugar de solo imprimirlos en consola (comportamiento por defecto de ANTLR).
- * Así Main puede decidir qué mostrar y las pruebas pueden contar los errores.
+ * en lugar de solo imprimirlos en consola (comportamiento por defecto de ANTLR)
+ * Así Main puede decidir qué mostrar y las pruebas pueden contar los errores
  */
 public class ErrorCollector extends BaseErrorListener {
 
-    /** Fase del compilador donde ocurrió el error. */
-    public enum Kind { LEXICO, SINTACTICO }
+    /** Fase del compilador donde ocurrió el error */
+    public enum Kind { LEXICO, SINTACTICO, SEMANTICO }
 
-    /** Un error con su fase, posición y mensaje. */
+    /** Un error con su fase, posición y mensaje */
     public record CompileError(Kind kind, int line, int column, String message) {
         @Override
         public String toString() {
-            String phase = (kind == Kind.LEXICO) ? "léxico" : "sintáctico";
+            String phase = switch (kind) {
+                case LEXICO -> "léxico";
+                case SINTACTICO -> "sintáctico";
+                case SEMANTICO -> "semántico";
+            };
             return String.format("[Error %s] línea %d:%d -> %s", phase, line, column, message);
         }
     }
 
     private final List<CompileError> errors = new ArrayList<>();
 
-    /** ANTLR llama a este método cada vez que el lexer o el parser encuentran un error. */
+    /** ANTLR llama a este método cada vez que el lexer o el parser encuentran un error */
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol,
                             int line, int charPositionInLine,
@@ -37,6 +41,11 @@ public class ErrorCollector extends BaseErrorListener {
         // Si quien reporta es el lexer, es error léxico; si es el parser, es sintáctico.
         Kind kind = (recognizer instanceof Lexer) ? Kind.LEXICO : Kind.SINTACTICO;
         errors.add(new CompileError(kind, line, charPositionInLine, msg));
+    }
+
+    /** Registra un error semántico, lo usa SemanticAnalyzer */
+    public void semantic(int line, int column, String message) {
+        errors.add(new CompileError(Kind.SEMANTICO, line, column, message));
     }
 
     public boolean hasErrors() {

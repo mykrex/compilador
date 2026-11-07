@@ -8,16 +8,36 @@ import java.util.Map;
 /**
  * Directorio de funciones del programa.
  *
- * <p>Las variables globales viven en un campo aparte, no como una entrada
- * especial del mapa de funciones: así cada {@link FunctionInfo} describe una función real</p>
+ * Las variables globales viven en un campo aparte, no como una entrada
+ * especial del mapa de funciones: así cada {@link FunctionInfo} describe una función real
  *
- * <p>Las estructuras solo guardan y buscan. Las reglas de nombres y los
- * mensajes de error los aplica el recorrido del árbol, que conoce línea y columna</p>
+ * Las estructuras solo guardan y buscan. Las reglas de nombres y los
+ * mensajes de error los aplica el recorrido del árbol, que conoce línea y columna
  */
 public final class FunctionDirectory {
 
+    public enum NameKind { PROGRAM, GLOBAL_VARIABLE, FUNCTION }
+
+    private String programName;
     private final VariableTable globals = new VariableTable();
     private final Map<String, FunctionInfo> functions = new LinkedHashMap<>();
+
+    /** Registra el nombre del programa; ocupa su nombre como cualquier otro*/
+    public void setProgramName(String name) {
+        this.programName = name;
+    }
+
+    public String programName() {
+        return programName;
+    }
+
+    /** Indica qué usa ya este nombre a nivel global, o null si está libre */
+    public NameKind globalUse(String name) {
+        if (name.equals(programName)) return NameKind.PROGRAM;
+        if (globals.contains(name)) return NameKind.GLOBAL_VARIABLE;
+        if (functions.containsKey(name)) return NameKind.FUNCTION;
+        return null;
+    }
 
     /** Tabla de variables globales (también es la que usa {@code main}) */
     public VariableTable globals() {
@@ -67,7 +87,8 @@ public final class FunctionDirectory {
     /** Vista legible del directorio (evidencia y depuración) */
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("Globales: ").append(globals);
+        StringBuilder sb = new StringBuilder("Programa: ").append(programName)
+                .append("\nGlobales: ").append(globals);
         for (FunctionInfo f : functions.values()) {
             sb.append('\n').append(f);
         }
