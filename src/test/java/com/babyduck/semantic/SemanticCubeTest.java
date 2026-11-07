@@ -1,8 +1,5 @@
-package com.babyduck;
+package com.babyduck.semantic;
 
-import com.babyduck.semantic.Op;
-import com.babyduck.semantic.SemanticCube;
-import com.babyduck.semantic.Type;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -19,25 +16,25 @@ class SemanticCubeTest {
 
     @ParameterizedTest(name = "{0} {1} {2} -> {3}")
     @CsvSource({
-            // ---- Aritmética + - * (D-24)
+            // ---- Aritmética + - *
             "INT,   PLUS,  INT,   INT",
             "INT,   MINUS, FLOAT, FLOAT",
             "FLOAT, MULT,  INT,   FLOAT",
             "FLOAT, PLUS,  FLOAT, FLOAT",
-            // ---- División siempre float (D-24)
+            // ---- División siempre float
             "INT,   DIV,   INT,   FLOAT",
             "FLOAT, DIV,   INT,   FLOAT",
-            // ---- Relacionales (D-25)
+            // ---- Relacionales
             "INT,   LT,    INT,   BOOL",
             "INT,   GT,    FLOAT, BOOL",
             "FLOAT, EQ,    INT,   BOOL",
             "FLOAT, NEQ,   FLOAT, BOOL",
-            // ---- Asignación destino <- valor (D-26)
+            // ---- Asignación destino <- valor
             "INT,   ASSIGN, INT,   INT",
             "FLOAT, ASSIGN, INT,   FLOAT",
             "FLOAT, ASSIGN, FLOAT, FLOAT",
             "INT,   ASSIGN, FLOAT, ERROR",
-            // ---- BOOL no participa en aritmética, comparación ni asignación (D-23, D-25)
+            // ---- BOOL no participa en aritmética, comparación ni asignación
             "BOOL,  PLUS,  INT,   ERROR",
             "INT,   MULT,  BOOL,  ERROR",
             "BOOL,  EQ,    BOOL,  ERROR",
@@ -72,7 +69,7 @@ class SemanticCubeTest {
         assertFalse(cube.canAssign(Type.INT, Type.FLOAT));
     }
 
-    /** Todas las operaciones de expresión son simétricas en tipos (D-29); la asignación no. */
+    /** Todas las operaciones de expresión son simétricas en tipos, la asignación no */
     @Test
     void expressionOperatorsAreTypeSymmetric() {
         for (Op op : Op.values()) {
