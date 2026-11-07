@@ -1,0 +1,6 @@
+// SEM21 · Regresar un float en una función int.
+// esperado: la función _Mitad_ regresa int, no puede regresar float
+program _RetTipo_;
+int _Mitad_(_X_ : int) [ { return _X_ / 2; } ];
+main { }
+end

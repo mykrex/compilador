@@ -1,0 +1,9 @@
+// SEM14 · Pasar un float a un parámetro int.
+// esperado: argumento 1 de _Doble_: no se puede pasar float a int
+program _TipoArg_;
+var _R_ : int;
+int _Doble_(_A_ : int) [ { return _A_ * 2; } ];
+main {
+    _R_ = _Doble_(2.5);
+}
+end

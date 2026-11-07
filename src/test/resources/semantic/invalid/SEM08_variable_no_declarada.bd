@@ -1,0 +1,8 @@
+// SEM08 · Uso de una variable que no fue declarada.
+// esperado: la variable _Y_ no está declarada
+program _NoDecl_;
+var _X_ : int;
+main {
+    _X_ = _Y_ + 1;
+}
+end

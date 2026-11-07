@@ -1,0 +1,11 @@
+// SEM22 · Estatuto después de un return.
+// esperado: código inalcanzable: hay un return antes de este estatuto
+program _Inalcanzable_;
+int _Uno_() [
+    {
+        return 1;
+        print("nunca");
+    }
+];
+main { }
+end

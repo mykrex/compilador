@@ -1,0 +1,7 @@
+// SEM18 · return fuera de una función.
+// esperado: return solo puede usarse dentro de una función
+program _RetMain_;
+main {
+    return;
+}
+end

@@ -1,0 +1,9 @@
+// SEM12 · Llamada con menos argumentos de los que pide la función.
+// esperado: _Suma_ espera 2 argumentos, recibió 1
+program _Args_;
+var _R_ : int;
+int _Suma_(_A_ : int, _B_ : int) [ { return _A_ + _B_; } ];
+main {
+    _R_ = _Suma_(1);
+}
+end

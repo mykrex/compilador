@@ -1,4 +1,4 @@
-// SEM06 · Una función con el nombre de una variable global (D-37, un solo espacio de nombres).
+// SEM06 · Una función con el nombre de una variable global (un solo espacio de nombres).
 // esperado: _Calc_ ya se usa como variable global
 program _Nombres_;
 var _Calc_ : int;

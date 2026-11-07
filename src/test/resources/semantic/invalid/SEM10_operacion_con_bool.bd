@@ -1,0 +1,11 @@
+// SEM10 · Operación aritmética con el resultado de una comparación.
+// esperado: no se puede aplicar + entre bool e int
+program _Opera_;
+var _A_, _B_ : int;
+    _F_ : float;
+main {
+    _A_ = 1;
+    _B_ = 2;
+    _F_ = (_A_ < _B_) + 1;
+}
+end

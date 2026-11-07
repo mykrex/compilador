@@ -1,0 +1,8 @@
+// SEM09 · Asignar un float a una variable int; la división siempre da float.
+// esperado: no se puede asignar float a _X_, que es int
+program _Asigna_;
+var _X_ : int;
+main {
+    _X_ = 7 / 2;
+}
+end

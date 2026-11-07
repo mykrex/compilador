@@ -1,4 +1,4 @@
-// SEM05 · Un parámetro con el nombre de una variable global (D-36, sin sombreado).
+// SEM05 · Un parámetro con el nombre de una variable global (sin sombreado).
 // esperado: _G_ ya se usa como variable global
 program _Sombra_;
 var _G_ : int;

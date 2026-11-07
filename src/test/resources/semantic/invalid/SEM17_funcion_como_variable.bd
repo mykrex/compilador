@@ -1,0 +1,9 @@
+// SEM17 · Usar el nombre de una función como si fuera una variable.
+// esperado: _Cuadrado_ es una función, no una variable
+program _MalUso_;
+var _R_ : int;
+int _Cuadrado_(_A_ : int) [ { return _A_ * _A_; } ];
+main {
+    _R_ = _Cuadrado_ + 1;
+}
+end

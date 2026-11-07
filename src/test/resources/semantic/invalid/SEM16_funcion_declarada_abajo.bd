@@ -1,0 +1,9 @@
+// SEM16 · Llamar a una función declarada más abajo (una pasada).
+// esperado: la función _Despues_ no está declarada
+program _Orden_;
+void _Antes_() [ { _Despues_(); } ];
+void _Despues_() [ { print("después"); } ];
+main {
+    _Antes_();
+}
+end

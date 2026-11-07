@@ -1,0 +1,12 @@
+// SEM13 · Función con valor que no regresa cuando la condición es falsa.
+// esperado: la función _Signo_ no regresa un valor en todos los caminos
+program _Caminos_;
+int _Signo_(_X_ : int) [
+    {
+        if (_X_ > 0) {
+            return 1;
+        };
+    }
+];
+main { }
+end

@@ -1,0 +1,6 @@
+// SEM19 · Una función void no puede regresar un valor.
+// esperado: la función _Nada_ es void, no puede regresar un valor
+program _RetVoid_;
+void _Nada_() [ { return 1; } ];
+main { }
+end

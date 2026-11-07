@@ -1,0 +1,65 @@
+// SEM07 · Usos válidos: promoción float ← int en asignación, argumento y return; print de una
+// comparación; función con valor usada como estatuto; return; en void; if/else que regresa en
+// ambas ramas; signo unario; recursión; llamadas dentro de expresiones; bloque [ ].
+program _Usos_;
+var _I_, _N_ : int;
+    _F_ : float;
+
+float _Mitad_(_X_ : float) [
+    {
+        return _X_ / 2;
+    }
+];
+
+int _Abs_(_X_ : int) [
+    {
+        if (_X_ < 0) {
+            return -_X_;
+        } else {
+            return _X_;
+        };
+    }
+];
+
+float _Real_(_K_ : int) [
+    {
+        return _K_;
+    }
+];
+
+void _Cuenta_(_Hasta_ : int) [
+    var _C_ : int;
+    {
+        if (_Hasta_ < 0) {
+            return;
+        };
+        _C_ = 0;
+        while (_C_ < _Hasta_) do {
+            print(_C_);
+            _C_ = _C_ + 1;
+        };
+    }
+];
+
+int _Fib_(_K_ : int) [
+    {
+        if (_K_ < 2) {
+            return _K_;
+        } else {
+            return _Fib_(_K_ - 1) + _Fib_(_K_ - 2);
+        };
+    }
+];
+
+main {
+    _N_ = 10;
+    _F_ = _N_;
+    _F_ = _Mitad_(_N_) + _Real_(3);
+    _I_ = -_Abs_(-5) * 2;
+    print("comparación: ", _F_ > _N_, " fib: ", _Fib_(_N_));
+    _Abs_(_I_);
+    _Cuenta_(3);
+    read(_I_);
+    [ _I_ = _I_ + 1; ]
+}
+end

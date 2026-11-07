@@ -1,0 +1,6 @@
+// SEM20 · Una función int debe regresar un valor.
+// esperado: la función _Uno_ debe regresar un valor int
+program _RetVacio_;
+int _Uno_() [ { return; } ];
+main { }
+end

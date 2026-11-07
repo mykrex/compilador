@@ -1,0 +1,9 @@
+// SEM15 · Usar el valor de una función void.
+// esperado: la función _Saluda_ es void y no devuelve un valor
+program _VoidExp_;
+var _R_ : int;
+void _Saluda_() [ { print("hola"); } ];
+main {
+    _R_ = _Saluda_() + 1;
+}
+end

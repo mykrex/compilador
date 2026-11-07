@@ -1,0 +1,11 @@
+// SEM11 · La condición de un if debe ser una comparación.
+// esperado: la condición del if debe ser una comparación (bool), se obtuvo int
+program _Cond_;
+var _X_ : int;
+main {
+    _X_ = 1;
+    if (_X_) {
+        print(_X_);
+    };
+}
+end
