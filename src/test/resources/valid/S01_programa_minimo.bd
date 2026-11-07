@@ -1,4 +1,0 @@
-// S01: Programa mínimo (sin variables, sin funciones, main vacío)
-program _Minimo_ ;
-main { }
-end
