@@ -53,7 +53,7 @@ public final class SemanticCube {
 
     // Llenado
 
-    /** {@code + - *} conservan int con int; {@code /} devuelve float */
+    /** { + - * } conservan int con int; { / } devuelve float */
     private void fillArithmetic() {
         for (Op op : new Op[]{Op.PLUS, Op.MINUS, Op.MULT}) {
             put(Type.INT, op, Type.INT, Type.INT);

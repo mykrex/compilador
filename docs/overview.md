@@ -5,16 +5,17 @@
 
 ## Índice
 
-1. [Overview](00_overview.md)
-2. [Herramientas de generación](01_herramientas.md)
-3. [Análisis Léxico](02_lexico.md)
-4. [Análisis Sintáctico](03_sintaxis.md)
-5. Análisis Semántico *(pendiente)*
-6. Código Intermedio *(pendiente)*
-7. Memoria Virtual *(pendiente)*
-8. Máquina Virtual *(pendiente)*
-9. [Testing](08_testing.md)
-10. [Herramientas de IA](09_herramientas_ia.md)
+0. [Overview](overview.md)
+1. [Herramientas](herramientas.md)
+2. [Análisis Léxico](lexico.md)
+3. [Análisis Sintáctico](sintaxis.md)
+4. [Análisis Semántico](semantica.md)
+5. Código Intermedio _(pendiente)_
+6. Memoria Virtual _(pendiente)_
+7. Máquina Virtual _(pendiente)_
+8. [Testing](08_testing.md)
+9. [Herramientas de IA](herramientas_ia.md)
+10. [Guía de uso](guia_de_uso.md)
 
 ---
 
@@ -26,13 +27,13 @@ El compilador se desarrolla en **Java** y usa **ANTLR4** para generar automátic
 
 ## 0.2 Tecnologías
 
-| Elemento | Versión / Herramienta |
-|---|---|
-| Lenguaje de desarrollo | Java 21 (LTS) |
-| Generador de Scanner y Parser | ANTLR 4.13.2 |
-| Gestor de proyecto y compilación | Maven |
-| Pruebas automáticas | JUnit 5 |
-| IDE | IntelliJ IDEA + plugin ANTLR v4 |
+| Elemento                         | Versión / Herramienta           |
+| -------------------------------- | ------------------------------- |
+| Lenguaje de desarrollo           | Java 21 (LTS)                   |
+| Generador de Scanner y Parser    | ANTLR 4.13.2                    |
+| Gestor de proyecto y compilación | Maven                           |
+| Pruebas automáticas              | JUnit 5                         |
+| IDE                              | IntelliJ IDEA + plugin ANTLR v4 |
 
 ## 0.3 Flujo del compilador (estado actual)
 
@@ -76,7 +77,7 @@ mvn compile                 # genera el Scanner/Parser y compila
 mvn test                    # ejecuta el Test-Plan (JUnit)
 ```
 
-Para analizar un programa (en IntelliJ, como *Program arguments* de `Main`):
+Para analizar un programa (en IntelliJ, como _Program arguments_ de `Main`):
 
 ```
 <archivo.bd> [--tokens]
@@ -87,11 +88,11 @@ Para analizar un programa (en IntelliJ, como *Program arguments* de `Main`):
 
 ## 0.6 Avance por entrega
 
-| Entrega | Contenido | Estado |
-|---|---|---|
-| 1 | Expresiones regulares, tokens y gramática libre de contexto (CFG) | ✅ |
-| 2 | Selección de herramienta, Scanner, Parser y Test-Plan | ✅ |
-| 3 | Análisis semántico | Pendiente |
+| Entrega | Contenido                                                         | Estado    |
+| ------- | ----------------------------------------------------------------- | --------- |
+| 1       | Expresiones regulares, tokens y gramática libre de contexto (CFG) | ✅        |
+| 2       | Selección de herramienta, Scanner, Parser y Test-Plan             | ✅        |
+| 3       | Análisis semántico                                                | Pendiente |
 
 ---
 

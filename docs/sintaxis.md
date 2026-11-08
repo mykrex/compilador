@@ -2,16 +2,17 @@
 
 ## Índice
 
-1. [Overview](00_overview.md)
-2. [Herramientas de generación](01_herramientas.md)
-3. [Análisis Léxico](02_lexico.md)
-4. [Análisis Sintáctico](03_sintaxis.md)
-5. Análisis Semántico *(pendiente)*
-6. Código Intermedio *(pendiente)*
-7. Memoria Virtual *(pendiente)*
-8. Máquina Virtual *(pendiente)*
-9. [Testing](08_testing.md)
-10. [Herramientas de IA](09_herramientas_ia.md)
+0. [Overview](overview.md)
+1. [Herramientas](herramientas.md)
+2. [Análisis Léxico](lexico.md)
+3. [Análisis Sintáctico](sintaxis.md)
+4. [Análisis Semántico](semantica.md)
+5. Código Intermedio _(pendiente)_
+6. Memoria Virtual _(pendiente)_
+7. Máquina Virtual _(pendiente)_
+8. [Testing](08_testing.md)
+9. [Herramientas de IA](herramientas_ia.md)
+10. [Guía de uso](guia_de_uso.md)
 
 ---
 
@@ -24,12 +25,12 @@ Las reglas de construcción de BabyDuck se dieron de alta en el archivo **`BabyD
 
 La CFG se diseñó originalmente en **BNF** ([§3.2](#32-gramática-original-bnf)) y se transcribió a EBNF sustituyendo las reglas recursivas con ε por los operadores:
 
-| Operador EBNF | Significado | Equivale en BNF a |
-|---|---|---|
-| `X?` | Opcional (0 o 1 vez) | `<X_opt> → X \| ε` |
-| `X*` | Cero o más veces | `<Li_X> → X <Li_X> \| ε` |
-| `X+` | Una o más veces | `<Li_X> → X <Li_X> \| X` |
-| `( ... )` | Agrupación | Una regla auxiliar para el grupo |
+| Operador EBNF | Significado          | Equivale en BNF a                |
+| ------------- | -------------------- | -------------------------------- |
+| `X?`          | Opcional (0 o 1 vez) | `<X_opt> → X \| ε`               |
+| `X*`          | Cero o más veces     | `<Li_X> → X <Li_X> \| ε`         |
+| `X+`          | Una o más veces      | `<Li_X> → X <Li_X> \| X`         |
+| `( ... )`     | Agrupación           | Una regla auxiliar para el grupo |
 
 Ejemplo:
 
@@ -107,14 +108,14 @@ Gramática entregada en la actividad anterior, basada en los diagramas de sintax
 
 Los diagramas de BabyDuck son una propuesta que puede ajustarse con justificación. Se hicieron las siguientes modificaciones:
 
-| # | Regla | Cambio | Tipo |
-|---|---|---|---|
-| 1 | `<F_call>` | Se quita el `;` y se agrega en `<Statement> → <F_call> ;` | Corrección |
-| 2 | `<Condition>`, `<Cycle>` | `<Statement>` → `<Body>` | Mejora de claridad |
-| 3 | `<Opr_rel>` | Se agrega `==` | Extensión |
-| 4 | `<Factor>` | El signo aplica a cualquier factor | Extensión |
-| 5 | `<Return>` | La expresión es opcional | Extensión |
-| 6 | Lexer | Comentarios `//` | Extensión léxica |
+| #   | Regla                    | Cambio                                                    | Tipo               |
+| --- | ------------------------ | --------------------------------------------------------- | ------------------ |
+| 1   | `<F_call>`               | Se quita el `;` y se agrega en `<Statement> → <F_call> ;` | Corrección         |
+| 2   | `<Condition>`, `<Cycle>` | `<Statement>` → `<Body>`                                  | Mejora de claridad |
+| 3   | `<Opr_rel>`              | Se agrega `==`                                            | Extensión          |
+| 4   | `<Factor>`               | El signo aplica a cualquier factor                        | Extensión          |
+| 5   | `<Return>`               | La expresión es opcional                                  | Extensión          |
+| 6   | Lexer                    | Comentarios `//`                                          | Extensión léxica   |
 
 ### M1. `<F_call>` sin `;`
 
@@ -141,15 +142,15 @@ Es el mismo criterio que con `<Expresion>`: la expresión no lleva `;`, y es el 
 <Cycle>     → while ( <Expresion> ) do <Body> ;
 ```
 
-| | `<Statement>` (original) | `<Body>` (modificación) |
-|---|---|---|
-| Sintaxis | `while (c) do _X_ = 1; ;` o `do [ ... ];` | `while (c) do { ... };` |
-| Doble `;` | Sí | No |
-| Delimitadores de bloque | `{ }` y `[ ]` | Solo `{ }` |
-| Bloques anidados | Difíciles de leer | Explícitos |
-| Costo | — | Un solo estatuto también va entre llaves |
+|                         | `<Statement>` (original)                  | `<Body>` (modificación)                  |
+| ----------------------- | ----------------------------------------- | ---------------------------------------- |
+| Sintaxis                | `while (c) do _X_ = 1; ;` o `do [ ... ];` | `while (c) do { ... };`                  |
+| Doble `;`               | Sí                                        | No                                       |
+| Delimitadores de bloque | `{ }` y `[ ]`                             | Solo `{ }`                               |
+| Bloques anidados        | Difíciles de leer                         | Explícitos                               |
+| Costo                   | —                                         | Un solo estatuto también va entre llaves |
 
-Se conserva el `;` final para que el cambio se limite a sustituir `<Statement>` por `<Body>`; ese `;` además evita la ambigüedad del *dangling else*. La generación de código intermedio (saltos `GotoF`/`Goto`) no se ve afectada. El proyecto de referencia del curso toma la misma decisión (`<CONDICION>` y `<CICLO>` usan `<CUERPO>`).
+Se conserva el `;` final para que el cambio se limite a sustituir `<Statement>` por `<Body>`; ese `;` además evita la ambigüedad del _dangling else_. La generación de código intermedio (saltos `GotoF`/`Goto`) no se ve afectada. El proyecto de referencia del curso toma la misma decisión (`<CONDICION>` y `<CICLO>` usan `<CUERPO>`).
 
 La alternativa `[ <Li_Statement> ]` de `<Statement>` se conserva tal como está en el diagrama.
 
@@ -300,41 +301,41 @@ funcCall   : ID LPAREN (expression (COMMA expression)*)? RPAREN ;   // M1
 
 ## 3.6 Equivalencia BNF → ANTLR
 
-| Gramática BNF | Regla en `BabyDuck.g4` |
-|---|---|
-| `<Programa>` | `program` |
-| `<Vars_opt>`, `<Vars>`, `<Declarar_var>`, `<Mas_id>`, `<Decl_mas>` | `vars?`, `vars`, `varDecl` |
-| `<Type>` | `type` |
-| `<Li_funcs>`, `<Funcs>`, `<TypeFunc>` | `funcDecl*`, `funcDecl`, `funcType` |
-| `<Params_opt>`, `<Param>`, `<Mas_params>` | `params?`, `params`, `param` |
-| `<Body>`, `<Li_Statement>` | `body`, `statement*` |
-| `<Statement>` | `statement` |
-| `<Assign>` | `assign` |
-| `<Condition>`, `<Co_else>` | `condition` |
-| `<Cycle>` | `cycle` |
-| `<Print>`, `<Li_print>`, `<Li_p>` | `print`, `printItem` |
-| `<Read>` | `read` |
-| `<Return>`, `<Ret_val>` | `returnStmt` |
-| `<F_call>`, `<Args_opt>`, `<More_args>` | `funcCall` |
-| `<Expresion>`, `<Rel_Expr>` | `expression` |
-| `<Opr_rel>` | `relOp` |
-| `<Exp>`, `<Add_term>`, `<Opr_add>` | `exp` |
-| `<Termino>`, `<Add_Fact>`, `<Opr_mult>` | `term` |
-| `<Factor>`, `<Signo_opt>` | `factor` |
-| `<valor>` | `value` |
-| `<CTE>` | `cte` |
+| Gramática BNF                                                      | Regla en `BabyDuck.g4`              |
+| ------------------------------------------------------------------ | ----------------------------------- |
+| `<Programa>`                                                       | `program`                           |
+| `<Vars_opt>`, `<Vars>`, `<Declarar_var>`, `<Mas_id>`, `<Decl_mas>` | `vars?`, `vars`, `varDecl`          |
+| `<Type>`                                                           | `type`                              |
+| `<Li_funcs>`, `<Funcs>`, `<TypeFunc>`                              | `funcDecl*`, `funcDecl`, `funcType` |
+| `<Params_opt>`, `<Param>`, `<Mas_params>`                          | `params?`, `params`, `param`        |
+| `<Body>`, `<Li_Statement>`                                         | `body`, `statement*`                |
+| `<Statement>`                                                      | `statement`                         |
+| `<Assign>`                                                         | `assign`                            |
+| `<Condition>`, `<Co_else>`                                         | `condition`                         |
+| `<Cycle>`                                                          | `cycle`                             |
+| `<Print>`, `<Li_print>`, `<Li_p>`                                  | `print`, `printItem`                |
+| `<Read>`                                                           | `read`                              |
+| `<Return>`, `<Ret_val>`                                            | `returnStmt`                        |
+| `<F_call>`, `<Args_opt>`, `<More_args>`                            | `funcCall`                          |
+| `<Expresion>`, `<Rel_Expr>`                                        | `expression`                        |
+| `<Opr_rel>`                                                        | `relOp`                             |
+| `<Exp>`, `<Add_term>`, `<Opr_add>`                                 | `exp`                               |
+| `<Termino>`, `<Add_Fact>`, `<Opr_mult>`                            | `term`                              |
+| `<Factor>`, `<Signo_opt>`                                          | `factor`                            |
+| `<valor>`                                                          | `value`                             |
+| `<CTE>`                                                            | `cte`                               |
 
 ## 3.7 Observaciones sobre la gramática
 
 - **Precedencia de operadores:** se obtiene de la jerarquía de reglas `expression → exp → term → factor`. Los operadores relacionales tienen la menor precedencia, después `+ -` y al final `* /`. Los paréntesis permiten alterarla.
 - **Un solo operador relacional por expresión:** `expression : exp (relOp exp)?` hace que `_A_ < _B_ < _C_` sea inválido.
-- **Reglas que empiezan con `id`:** `assign`, `funcCall` y el `ID` dentro de `value` comparten el primer token. El algoritmo ALL(\*) de ANTLR revisa los tokens siguientes (`=`, `(` u otro) y elige la alternativa correcta sin indicar *lookahead* manualmente.
+- **Reglas que empiezan con `id`:** `assign`, `funcCall` y el `ID` dentro de `value` comparten el primer token. El algoritmo ALL(\*) de ANTLR revisa los tokens siguientes (`=`, `(` u otro) y elige la alternativa correcta sin indicar _lookahead_ manualmente.
 - **Orden de las secciones del programa:** `var` → funciones → `main`. Declarar variables globales después de las funciones es un error de sintaxis.
 - **Validaciones que no son sintácticas:** que una variable esté declarada, la compatibilidad de tipos y el uso correcto de `return` se verificarán en el análisis semántico.
 
 ## 3.8 Manejo de errores sintácticos
 
-ANTLR reporta los errores a los *error listeners* del lexer y del parser. Por defecto solo los imprime y continúa; en este proyecto se reemplazan por `ErrorCollector`, que guarda cada error con su fase, línea y columna:
+ANTLR reporta los errores a los _error listeners_ del lexer y del parser. Por defecto solo los imprime y continúa; en este proyecto se reemplazan por `ErrorCollector`, que guarda cada error con su fase, línea y columna:
 
 ```java
 ErrorCollector errors = new ErrorCollector();
@@ -351,12 +352,12 @@ Ejemplo de salida:
 
 Mensajes típicos de ANTLR:
 
-| Mensaje | Significado |
-|---|---|
-| `missing X at 'Y'` | Faltaba el token X antes de Y |
-| `extraneous input 'X' expecting {...}` | Sobra el token X |
+| Mensaje                                | Significado                               |
+| -------------------------------------- | ----------------------------------------- |
+| `missing X at 'Y'`                     | Faltaba el token X antes de Y             |
+| `extraneous input 'X' expecting {...}` | Sobra el token X                          |
 | `mismatched input 'X' expecting {...}` | Se encontró X donde se esperaba otra cosa |
-| `no viable alternative at input '...'` | Ninguna alternativa de la regla coincide |
+| `no viable alternative at input '...'` | Ninguna alternativa de la regla coincide  |
 
 Después de un error, ANTLR intenta recuperarse y seguir analizando, por lo que un solo error puede provocar otros en cascada. El primer error reportado es el que indica la causa.
 

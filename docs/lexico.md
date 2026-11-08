@@ -2,28 +2,29 @@
 
 ## Índice
 
-1. [Overview](00_overview.md)
-2. [Herramientas de generación](01_herramientas.md)
-3. [Análisis Léxico](02_lexico.md)
-4. [Análisis Sintáctico](03_sintaxis.md)
-5. Análisis Semántico *(pendiente)*
-6. Código Intermedio *(pendiente)*
-7. Memoria Virtual *(pendiente)*
-8. Máquina Virtual *(pendiente)*
-9. [Testing](08_testing.md)
-10. [Herramientas de IA](09_herramientas_ia.md)
+0. [Overview](overview.md)
+1. [Herramientas](herramientas.md)
+2. [Análisis Léxico](lexico.md)
+3. [Análisis Sintáctico](sintaxis.md)
+4. [Análisis Semántico](semantica.md)
+5. Código Intermedio _(pendiente)_
+6. Memoria Virtual _(pendiente)_
+7. Máquina Virtual _(pendiente)_
+8. [Testing](08_testing.md)
+9. [Herramientas de IA](herramientas_ia.md)
+10. [Guía de uso](guia_de_uso.md)
 
 ---
 
 ## 2.1 Expresiones regulares
 
-| Token | Expresión regular | Ejemplos válidos |
-|---|---|---|
-| `id` | `_[A-Z][A-Za-z0-9_]*_` | `_X_`, `_Contador_`, `_A1_b_` |
-| `cte_int` | `[0-9]+` | `0`, `42` |
-| `cte_float` | `[0-9]+\.[0-9]+` | `3.14`, `10.0` |
-| `cte_string` | `"([^"\\\n]\|\\.)*"` | `"hola"`, `""`, `"dice \"hola\""` |
-| comentario | `//[^\n]*` | `// esto se ignora` |
+| Token        | Expresión regular      | Ejemplos válidos                  |
+| ------------ | ---------------------- | --------------------------------- |
+| `id`         | `_[A-Z][A-Za-z0-9_]*_` | `_X_`, `_Contador_`, `_A1_b_`     |
+| `cte_int`    | `[0-9]+`               | `0`, `42`                         |
+| `cte_float`  | `[0-9]+\.[0-9]+`       | `3.14`, `10.0`                    |
+| `cte_string` | `"([^"\\\n]\|\\.)*"`   | `"hola"`, `""`, `"dice \"hola\""` |
+| comentario   | `//[^\n]*`             | `// esto se ignora`               |
 
 ### Decisiones de diseño
 
@@ -38,56 +39,56 @@
 
 ### Palabras reservadas
 
-| Token | Lexema | Token | Lexema |
-|---|---|---|---|
-| `PROGRAM` | `program` | `WHILE` | `while` |
-| `MAIN` | `main` | `DO` | `do` |
-| `END` | `end` | `IF` | `if` |
-| `VOID` | `void` | `ELSE` | `else` |
-| `VAR` | `var` | `READ` | `read` |
-| `PRINT` | `print` | `RETURN` | `return` |
-| `INT` | `int` | | |
-| `FLOAT` | `float` | | |
+| Token     | Lexema    | Token    | Lexema   |
+| --------- | --------- | -------- | -------- |
+| `PROGRAM` | `program` | `WHILE`  | `while`  |
+| `MAIN`    | `main`    | `DO`     | `do`     |
+| `END`     | `end`     | `IF`     | `if`     |
+| `VOID`    | `void`    | `ELSE`   | `else`   |
+| `VAR`     | `var`     | `READ`   | `read`   |
+| `PRINT`   | `print`   | `RETURN` | `return` |
+| `INT`     | `int`     |          |          |
+| `FLOAT`   | `float`   |          |          |
 
 ### Operadores
 
-| Token | Lexema | Descripción |
-|---|---|---|
-| `PLUS` | `+` | Suma / signo positivo |
-| `MINUS` | `-` | Resta / signo negativo |
-| `MULT` | `*` | Multiplicación |
-| `DIV` | `/` | División |
-| `ASSIGN` | `=` | Asignación |
-| `EQ` | `==` | Igual a *(extensión, ver [§3.3](03_sintaxis.md#33-modificaciones-a-la-especificación))* |
-| `NEQ` | `!=` | Diferente de |
-| `GT` | `>` | Mayor que |
-| `LT` | `<` | Menor que |
+| Token    | Lexema | Descripción                                                                             |
+| -------- | ------ | --------------------------------------------------------------------------------------- |
+| `PLUS`   | `+`    | Suma / signo positivo                                                                   |
+| `MINUS`  | `-`    | Resta / signo negativo                                                                  |
+| `MULT`   | `*`    | Multiplicación                                                                          |
+| `DIV`    | `/`    | División                                                                                |
+| `ASSIGN` | `=`    | Asignación                                                                              |
+| `EQ`     | `==`   | Igual a _(extensión, ver [§3.3](03_sintaxis.md#33-modificaciones-a-la-especificación))_ |
+| `NEQ`    | `!=`   | Diferente de                                                                            |
+| `GT`     | `>`    | Mayor que                                                                               |
+| `LT`     | `<`    | Menor que                                                                               |
 
 ### Caracteres especiales
 
-| Token | Lexema | Token | Lexema |
-|---|---|---|---|
-| `SEMI` | `;` | `LPAREN` | `(` |
-| `COMMA` | `,` | `RPAREN` | `)` |
-| `COLON` | `:` | `LBRACKET` | `[` |
-| `LBRACE` | `{` | `RBRACKET` | `]` |
-| `RBRACE` | `}` | | |
+| Token    | Lexema | Token      | Lexema |
+| -------- | ------ | ---------- | ------ |
+| `SEMI`   | `;`    | `LPAREN`   | `(`    |
+| `COMMA`  | `,`    | `RPAREN`   | `)`    |
+| `COLON`  | `:`    | `LBRACKET` | `[`    |
+| `LBRACE` | `{`    | `RBRACKET` | `]`    |
+| `RBRACE` | `}`    |            |        |
 
 ### Identificadores y constantes
 
-| Token | Descripción |
-|---|---|
-| `ID` | Identificadores de variables, funciones y del programa |
-| `CTE_INT` | Constantes enteras |
-| `CTE_FLOAT` | Constantes flotantes |
-| `CTE_STRING` | Letreros (constantes de texto) |
+| Token        | Descripción                                            |
+| ------------ | ------------------------------------------------------ |
+| `ID`         | Identificadores de variables, funciones y del programa |
+| `CTE_INT`    | Constantes enteras                                     |
+| `CTE_FLOAT`  | Constantes flotantes                                   |
+| `CTE_STRING` | Letreros (constantes de texto)                         |
 
 ### Tokens ignorados
 
-| Token | Descripción |
-|---|---|
-| `WS` | Espacios, tabuladores y saltos de línea |
-| `COMMENT` | Comentarios de una línea `// ...` |
+| Token     | Descripción                             |
+| --------- | --------------------------------------- |
+| `WS`      | Espacios, tabuladores y saltos de línea |
+| `COMMENT` | Comentarios de una línea `// ...`       |
 
 ## 2.3 Implementación en ANTLR4
 
