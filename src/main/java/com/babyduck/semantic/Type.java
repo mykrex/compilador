@@ -6,6 +6,8 @@ package com.babyduck.semantic;
  * {@code INT}, {@code FLOAT}: tipos declarables por el programador
  * {@code BOOL}: solo existe como resultado de {@code > < == !=}; no se puede declarar
  * {@code VOID}: tipo de retorno de funciones sin valor; nunca es válido dentro de una expresión
+ * {@code STRING}: solo para los letreros de print; no se declara, no entra al cubo ni a las pilas
+ *                 (existe para que la memoria virtual pueda darle su rango a los letreros)
  * {@code ERROR}: resultado de cualquier combinación inválida en el cubo semántico
  *
  */
@@ -14,6 +16,7 @@ public enum Type {
     FLOAT,
     BOOL,
     VOID,
+    STRING,
     ERROR;
 
     /**
