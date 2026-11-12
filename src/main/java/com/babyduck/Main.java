@@ -1,6 +1,7 @@
 package com.babyduck;
 
 import org.antlr.v4.runtime.CharStreams;
+import com.babyduck.intermediate.QuadrupleQueue;
 import org.antlr.v4.runtime.Token;
 
 import java.io.IOException;
@@ -10,7 +11,7 @@ import java.util.List;
  * Punto de entrada del compilador BabyDuck.
  *
  * Uso:
- *   java com.babyduck.Main programa.bd            analiza léxico + sintaxis + semántica
+ *   java com.babyduck.Main programa.bd            analiza léxico + sintaxis + semántica y genera los cuádruplos
  *   java com.babyduck.Main programa.bd --tokens   además imprime la lista de tokens
  */
 public class Main {
@@ -35,6 +36,9 @@ public class Main {
             System.out.println();
             System.out.println("=== Directorio de funciones ===");
             System.out.println(result.directory());
+            System.out.println();
+            System.out.println("=== Cuádruplos ===");
+            System.out.print(result.quadruples().format(QuadrupleQueue.Style.FULL));
         } else {
             System.out.println("Se encontraron " + result.errors().size() + " error(es) en " + path + ":");
             result.errors().forEach(e -> System.out.println("  " + e));

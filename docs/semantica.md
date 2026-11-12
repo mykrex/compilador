@@ -7,7 +7,7 @@
 2. [Análisis Léxico](lexico.md)
 3. [Análisis Sintáctico](sintaxis.md)
 4. [Análisis Semántico](semantica.md)
-5. [Código Intermedio](05_codigo_intermedio.md)
+5. [Código Intermedio](codigo_intermedio.md)
 6. [Memoria Virtual](06_memoria_virtual.md)
 7. [Máquina Virtual](07_maquina_virtual.md)
 8. [Testing](08_testing.md)
@@ -33,7 +33,7 @@ Para implementar esta etapa se diseñaron:
 1. Un **cubo semántico**.
 2. Un **directorio de funciones**.
 3. Una **tabla de variables** por alcance.
-4. Un **recorrido del árbol sintáctico** (Visitor) con los puntos neurálgicos que llenan las estructuras y validan.
+4. Un **recorrido del árbol sintáctico** (Visitor) con los puntos neurálgicos que llenan las estructuras y validan. Desde la entrega 3, los mismos puntos generan los cuádruplos ([Código Intermedio](codigo_intermedio.md)).
 
 La semántica se ejecuta **solo si el análisis léxico y el sintáctico terminaron sin errores**. Cuando hay errores de sintaxis, ANTLR repara el árbol para poder continuar, y revisar ese árbol reparado produciría errores semánticos falsos.
 
@@ -57,6 +57,7 @@ Cada restricción que resulta de este criterio se explica, con ejemplos, en la [
 | `float` | Sí: variables, parámetros y funciones | Constantes flotantes, operaciones con un `float` y toda división            |
 | `bool`  | No                                    | Resultado de `> < == !=`; tipo que exigen las condiciones de `if` y `while` |
 | `void`  | Solo como tipo de una función         | Funciones sin valor de retorno; nunca es válido dentro de una expresión     |
+| `string` | No                                   | Solo los letreros de `print`, como operandos del cuádruplo `PRINT`; no entra al cubo ni a las pilas |
 | `error` | No                                    | Resultado de cualquier combinación inválida                                 |
 
 ### ¿Por qué un tipo `bool` y no enteros 0/1 como en C?
@@ -65,9 +66,11 @@ Con la convención de C, expresiones como `if (_X_)` o `(_A_ < _B_) + 1` serían
 
 La desventaja es que el resultado de una comparación no se puede guardar en una variable. Tiene poco impacto, porque BabyDuck no tiene variables booleanas ni operadores lógicos (`and`, `or`). El costo es pequeño: unas casillas más en el cubo y, en la etapa de memoria, un segmento para temporales booleanos.
 
-### ¿Por qué no hay tipo `string`?
+### El tipo `string`, solo para letreros
 
-La gramática solo permite letreros dentro de `print` (`printItem : expression | CTE_STRING`), así que nunca llegan a una expresión y el cubo no necesita considerarlos.
+La gramática solo permite letreros dentro de `print` (`printItem : expression | CTE_STRING`), así que nunca llegan a una expresión y el cubo no necesita considerarlos. Aun así existe el tipo interno `string`: cada letrero es un operando del cuádruplo `PRINT`, y todo operando lleva un tipo. No se puede declarar, no entra a las pilas y el cubo lo rechaza por omisión, igual que cualquier combinación no registrada.
+
+> **Entrega 3:** en la entrega 2 no existía este tipo. Ver [Cambios respecto a la entrega 2](codigo_intermedio.md#10-cambios-respecto-a-la-entrega-2).
 
 ---
 
@@ -175,7 +178,7 @@ Las estructuras están en el paquete `com.babyduck.semantic`, que **no depende d
 | `VariableTable`     | `semantic` | Tabla de variables de un alcance                                |
 | `FunctionInfo`      | `semantic` | Datos de una función                                            |
 | `FunctionDirectory` | `semantic` | Directorio de funciones                                         |
-| `SemanticAnalyzer`  | `babyduck` | Recorrido del árbol: llena las estructuras y valida             |
+| `SemanticAnalyzer`  | `babyduck` | Recorrido del árbol: llena las estructuras, valida y, con `QuadrupleGenerator`, genera los cuádruplos |
 | `ErrorCollector`    | `babyduck` | Junta los errores léxicos, sintácticos y semánticos             |
 | `BabyDuckAnalyzer`  | `babyduck` | `compile()`: léxico + sintaxis y, si no hubo errores, semántica |
 
@@ -339,12 +342,14 @@ ANTLR genera dos formas de recorrer el árbol:
 | Recorrido                     | Automático                                                   | Cada método visita a sus hijos                         |
 | Dónde van las acciones        | Solo al entrar o salir de una regla                          | En cualquier punto del método, en el orden de la regla |
 | Acciones a mitad de una regla | Indirectas: en una regla hija, preguntando quién es su padre | Directas                                               |
-| Tipo de una expresión         | Requiere una pila de tipos                                   | El método devuelve el tipo                             |
+| Tipo de una expresión         | Pila de tipos                                                | Pila de tipos (en la entrega 2, el método devolvía el tipo) |
 | Riesgo                        | Ninguno de omitir nodos                                      | Olvidar visitar un hijo deja ese subárbol sin revisar  |
 
 El Visitor permite colocar cada punto neurálgico donde corresponde, incluidos los que quedan a mitad de una regla (los que necesitarán `if`, `else` y `while` al generar código). El riesgo de omitir un hijo se reduce porque las reglas que no se programan se recorren automáticamente (`visitChildren`) y porque las pruebas revisan cada construcción.
 
-`SemanticAnalyzer extends BabyDuckBaseVisitor<Type>`: los métodos de expresiones devuelven su tipo; los de declaraciones y estatutos devuelven `null`.
+`SemanticAnalyzer extends BabyDuckBaseVisitor<Void>`: ningún método devuelve un valor. Los métodos de expresiones dejan su resultado (operando y tipo) en las pilas del generador de cuádruplos, y quien usa la expresión lo saca de ahí; el cubo se consulta al sacar los operandos. El Visitor se conserva por las acciones a mitad de regla.
+
+> **Entrega 3:** en la entrega 2 los métodos de expresiones devolvían su tipo (`BabyDuckBaseVisitor<Type>`); ahora la pila de tipos es la única fuente. Ver [Cambios respecto a la entrega 2](codigo_intermedio.md#10-cambios-respecto-a-la-entrega-2).
 
 ANTLR construye el **árbol completo antes del recorrido**, así que cada método tiene a la mano todos los hijos de su regla. En `var _A_, _B_ : int;` el tipo aparece **después** de los nombres, y aun así no hace falta una variable que recuerde el tipo actual: `ctx.type()` y `ctx.ID()` están en el mismo nodo.
 
@@ -366,18 +371,18 @@ Las variables locales pasan por el punto 3 con la tabla de la función actual co
 
 | Punto | Regla y método                             | Acción                                                                                    |
 | ----- | ------------------------------------------ | ----------------------------------------------------------------------------------------- |
-| 8     | `factor` (`visitFactor`)                   | Tipo de la constante, variable, llamada o paréntesis; después, el signo con `unaryResult` |
-| 9     | `term`, `exp` (`visitTerm`, `visitExp`)    | Combina los operandos de izquierda a derecha con `cube.result`                            |
-| 10    | `expression` (`visitExpression`)           | Si hay relacional, combina ambos lados (resultado `bool`)                                 |
-| 11    | `assign` (`visitAssign`)                   | El destino debe ser una variable visible; `canAssign(destino, valor)`                     |
+| 8     | `factor` (`visitFactor`)                   | Mete a las pilas la constante (con su signo, si va pegado), la variable (que debe estar declarada), el temporal de la llamada o el resultado del paréntesis; después, el signo con `unaryResult` y, si es `-`, el cuádruplo `UMINUS` |
+| 9     | `term`, `exp` (`visitTerm`, `visitExp`)    | Después de cada operando, si el tope de la pila es su operador: saca dos operandos, consulta `cube.result` y genera el cuádruplo |
+| 10    | `expression` (`visitExpression`)           | Si hay relacional, al terminar el lado derecho saca ambos lados, consulta el cubo (resultado `bool`) y genera el cuádruplo |
+| 11    | `assign` (`visitAssign`)                   | El destino debe ser una variable visible; saca el valor, `canAssign(destino, valor)` y genera `=` |
 | 12    | `condition`, `cycle`                       | La condición debe ser `bool`                                                              |
-| 13    | `read` (`visitRead`)                       | El nombre debe ser una variable visible                                                   |
+| 13    | `read` (`visitRead`)                       | El nombre debe ser una variable visible; genera `READ`                                    |
 | 14    | `funcCall` como estatuto (`visitFuncCall`) | Revisa la llamada; si regresa un valor, se descarta                                       |
 | 15    | `returnStmt` (`visitReturnStmt`)           | Reglas de `return` (§4.9)                                                                 |
 | 16    | `funcDecl`, antes del cuerpo               | La función con valor regresa en todos los caminos                                         |
 | 17    | `body` y bloques `[ ]`                     | Código inalcanzable después de un `return`                                                |
 
-Para `_A_ + 2 * _F_(1)`: `visitFactor` devuelve el tipo de `_A_`, de `2` y de la llamada; `visitTerm` combina `2 * _F_(1)`; `visitExp` combina el `+`. Los operadores se toman por su posición entre los hijos del nodo (`[operando, op, operando, op, …]`, el operador _i_ está en la posición `2i - 1`), sin modificar la gramática.
+Para `_A_ + 2 * _F_(1)`: `visitFactor` mete a las pilas `_A_`, `2` y el temporal de la llamada; `visitTerm` saca `2` y el temporal y genera el `*`; `visitExp` genera el `+`. Los operadores se toman por su posición entre los hijos del nodo (`[operando, op, operando, op, …]`, el operador _i_ está en la posición `2i - 1`), sin modificar la gramática.
 
 ### Vista general
 
@@ -436,6 +441,9 @@ En una llamada se compara primero el número de argumentos; si no coincide, se r
 | Operación inválida      | `no se puede aplicar + entre bool e int`                             |
 | Signo inválido          | `no se puede aplicar el signo - a bool`                              |
 | Condición no booleana   | `la condición del if debe ser una comparación (bool), se obtuvo int` |
+| Constante fuera de rango | `la constante 2147483648 no cabe en int` (también un `float` infinito) |
+
+La constante se convierte con su signo cuando va pegado, así que `-2147483648` es válida. Este error se agregó en la entrega 3, al convertir las constantes a número para los cuádruplos.
 
 ### `return`
 
@@ -485,7 +493,7 @@ código inalcanzable: hay un return antes de este estatuto
 
 1. **La semántica solo corre si no hubo errores léxicos ni sintácticos.** `BabyDuckAnalyzer.compile()` ejecuta `analyze()` y, solo si el resultado es válido, ejecuta `SemanticAnalyzer`. `analyze()` no cambió, así que las pruebas sintácticas siguen probando solo la sintaxis.
 2. **Se reportan todos los errores, en orden de línea.** El programador puede corregir varios en una sola compilación, igual que con los errores léxicos y sintácticos. Como el recorrido va de arriba abajo, no hace falta ordenarlos.
-3. **Sin errores en cadena.** Si una parte de una expresión ya es `error`, ese error ya se reportó y las operaciones que la usan no reportan otro.
+3. **Sin errores en cadena.** Si una parte de una expresión ya es `error`, ese error ya se reportó y las operaciones que la usan no reportan otro. Desde la entrega 3, la parte con error es un operando especial que viaja por las pilas: no genera mensajes ni cuádruplos, y las pilas no se desbalancean ([§4 de Código Intermedio](codigo_intermedio.md#4-errores-durante-la-generación)).
 
 ```
 _Y_ = _X_ + 1;        // _X_ no declarada
@@ -513,7 +521,7 @@ end
 [Error semántico] línea 4:54 -> _Multi_ ya se usa como nombre del programa
 ```
 
-Cuando el programa es válido, `Main` imprime el árbol sintáctico y el directorio de funciones:
+Cuando el programa es válido, `Main` imprime el árbol sintáctico, el directorio de funciones y la fila de cuádruplos:
 
 ```text
 === Directorio de funciones ===
@@ -591,4 +599,4 @@ En `SemanticTest`, un programa válido no debe producir errores, y uno inválido
 ## Navegación
 
 - Anterior: [← Análisis Sintáctico](03_sintaxis.md)
-- Siguiente: [Código Intermedio →](05_codigo_intermedio.md)
+- Siguiente: [Código Intermedio →](codigo_intermedio.md)

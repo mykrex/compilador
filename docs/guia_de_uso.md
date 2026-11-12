@@ -7,7 +7,7 @@
 2. [Análisis Léxico](02_lexico.md)
 3. [Análisis Sintáctico](03_sintaxis.md)
 4. [Análisis Semántico](04_semantica.md)
-5. [Código Intermedio](05_codigo_intermedio.md)
+5. [Código Intermedio](codigo_intermedio.md)
 6. [Memoria Virtual](06_memoria_virtual.md)
 7. [Máquina Virtual](07_maquina_virtual.md)
 8. [Testing](08_testing.md)
@@ -16,7 +16,7 @@
 
 ---
 
-> **Estado de la guía.** Cubre lo que el compilador ya hace: revisar el léxico, la sintaxis y la semántica de un programa. Las secciones de ejecución (entrada, salida y errores en tiempo de ejecución) se completarán cuando estén listas la generación de código y la máquina virtual; están marcadas como _pendiente_.
+> **Estado de la guía.** Cubre lo que el compilador ya hace: revisar el léxico, la sintaxis y la semántica de un programa, y generar el código intermedio (cuádruplos) de sus expresiones y estatutos lineales. Las secciones de ejecución (entrada, salida y errores en tiempo de ejecución) se completarán cuando estén listas la memoria y la máquina virtual; están marcadas como _pendiente_.
 
 Esta guía está pensada para alguien que quiere **escribir programas en BabyDuck**. Explica cómo se escribe un programa, qué reglas sigue el compilador, qué errores puede encontrar y cómo corregirlos. El porqué de cada regla está en los capítulos técnicos (por ejemplo, [Análisis Semántico](04_semantica.md)).
 
@@ -58,14 +58,14 @@ java -cp "target/classes:$(cat cp.txt)" com.babyduck.Main ejemplos/factorial.bd
 
 ### Opciones
 
-| Comando                     | Qué hace                                                             |
-| --------------------------- | -------------------------------------------------------------------- |
-| `Main programa.bd`          | Revisa el programa (léxico, sintaxis y semántica)                    |
-| `Main programa.bd --tokens` | Además, imprime la lista de tokens que encontró el analizador léxico |
+| Comando                     | Qué hace                                                                   |
+| --------------------------- | -------------------------------------------------------------------------- |
+| `Main programa.bd`          | Revisa el programa (léxico, sintaxis y semántica) y muestra sus cuádruplos |
+| `Main programa.bd --tokens` | Además, imprime la lista de tokens que encontró el analizador léxico       |
 
 ### Qué muestra el compilador
 
-**Si el programa es correcto**, imprime `Programa válido`, el árbol sintáctico y el directorio de funciones (las variables y funciones que encontró):
+**Si el programa es correcto**, imprime `Programa válido`, el árbol sintáctico, el directorio de funciones (las variables y funciones que encontró) y la fila de cuádruplos (el código intermedio, ver [10.14](#1014-ejecución-de-programas)):
 
 ```text
 Programa válido: ejemplos/factorial.bd
@@ -77,6 +77,10 @@ Globales: [_N_:int, _R_:int]
 _Fact_ -> int
   params:  [_K_:int]
   locales: [_K_:int]
+
+=== Cuádruplos ===
+#  op   izq  der  res
+...
 ```
 
 **Si tiene errores**, los lista con su fase, línea y columna, y termina con código de salida 1:
@@ -87,7 +91,7 @@ Se encontraron 2 error(es) en programa.bd:
   [Error semántico] línea 9:8 -> no se puede asignar float a _X_, que es int
 ```
 
-El compilador revisa en tres fases. Si hay errores léxicos o sintácticos, **no** se hace la revisión semántica (primero hay que corregir la forma del programa). Dentro de cada fase se reportan todos los errores, en orden de línea.
+El compilador revisa en tres fases. Si hay errores léxicos o sintácticos, **no** se hace la revisión semántica (primero hay que corregir la forma del programa). Dentro de cada fase se reportan todos los errores, en orden de línea. Si hay cualquier error, no se muestran cuádruplos.
 
 ---
 
@@ -159,10 +163,12 @@ Gracias a este formato, un identificador nunca puede confundirse con una palabra
 
 | Tipo     | Ejemplos válidos      | Inválidos                                                |
 | -------- | --------------------- | -------------------------------------------------------- |
-| Entera   | `0`, `42`, `1000`     | —                                                        |
+| Entera   | `0`, `42`, `1000`     | Mayores que `2147483647` (no caben en un `int`)          |
 | Flotante | `3.14`, `10.0`, `0.5` | `3.` y `.5` (debe haber dígitos a ambos lados del punto) |
 
-Las constantes no llevan signo: `-2` se escribe igual, pero el compilador lo interpreta como el signo `-` aplicado a `2`.
+**Números negativos.** Las constantes se escriben sin signo, pero el signo puede ir delante de cualquier valor: `-2`, `-_X_`, `-(_A_ + 1)`. Cuando el signo va pegado a un número, el compilador lo convierte directamente en la constante negativa (`-2`), así que el menor entero, `-2147483648`, es válido aunque `2147483648` solo no quepa en un `int`.
+
+Una constante entera que no cabe en un `int`, o una flotante tan grande que no puede representarse, es un error: `la constante 2147483648 no cabe en int`.
 
 ### Letreros
 
@@ -289,6 +295,8 @@ Detalles:
 - `while` lleva la palabra `do` antes de las llaves.
 - La condición de `if` y `while` debe ser una **comparación**: `if (_X_)` es un error.
 - `print` acepta expresiones y letreros mezclados, separados por comas. Una comparación se muestra como `true` o `false`.
+- **Cada `print` termina su línea**: `print("a"); print("b");` muestra `a` y `b` en líneas distintas.
+- **`print` no agrega espacios entre elementos**: si quieres separarlos, inclúyelos en los letreros, por ejemplo `print("total: ", _T_);`.
 - `read` lee **una** variable; para leer varias, usa varios `read`.
 - `=` no se encadena: `_A_ = _B_ = 1;` es un error de sintaxis.
 
@@ -356,6 +364,7 @@ El compilador no evalúa las condiciones: un `while` siempre se considera un cic
 | Nombres únicos entre programa, funciones y globales     | Usa nombres descriptivos y distintos                       |
 | Las locales no pueden llamarse como una global          | —                                                          |
 | `read` lee una sola variable                            | Usa varios `read`                                          |
+| `print` no separa los elementos con espacios            | Incluye los espacios en los letreros                       |
 | Letreros solo en `print`                                | —                                                          |
 
 ---
@@ -434,6 +443,7 @@ Los errores léxicos y sintácticos los genera ANTLR y aparecen en inglés. Los 
 | `no se puede asignar float a _X_, que es int`                        | `float` guardado en `int` (por ejemplo, una división)                                | Declara `_X_` como `float`                         |
 | `no se puede aplicar + entre bool e int`                             | Una comparación usada en aritmética                                                  | Usa la comparación solo en `if`/`while`/`print`    |
 | `no se puede aplicar el signo - a bool`                              | Signo aplicado a una comparación                                                     | Quita el signo                                     |
+| `la constante 2147483648 no cabe en int`                             | Entero mayor que `2147483647` (o menor que `-2147483648`)                            | Usa un número dentro del rango o un `float`        |
 | `la condición del if debe ser una comparación (bool), se obtuvo int` | `if (_X_)`                                                                           | `if (_X_ != 0)`                                    |
 | `return solo puede usarse dentro de una función`                     | `return` en `main`                                                                   | Quítalo                                            |
 | `la función _F_ es void, no puede regresar un valor`                 | `return valor;` en función `void`                                                    | Usa `return;` o cambia el tipo de la función       |
@@ -551,7 +561,33 @@ Este ejemplo muestra:
 
 ## 10.14 Ejecución de programas
 
-> _Pendiente (código intermedio, memoria virtual y máquina virtual)._ Esta sección explicará cómo ejecutar un programa compilado, cómo introducir datos con `read`, cómo se muestran los resultados de `print` y cómo ver el código intermedio generado.
+### Ver el código intermedio
+
+Cuando el programa no tiene errores, el compilador muestra, después del directorio de funciones, la **fila de cuádruplos**: las instrucciones que ejecutará la máquina virtual. Cada renglón es `(operador, izquierdo, derecho, resultado)`; los `t1`, `t2`… son resultados intermedios que crea el compilador y `_` indica un campo vacío.
+
+```text
+_X_ = (_A_ + _B_) * -_C_;
+print("x = ", _X_);
+
+=== Cuádruplos ===
+#  op       izq     der  res
+0  +        _A_     _B_  t1
+1  UMINUS   _C_     _    t2
+2  *        t1      t2   t3
+3  =        t3      _    _X_
+4  PRINT    "x = "  _    _
+5  PRINT    _X_     _    _
+6  PRINTLN  _       _    _
+7  END      _       _    _
+```
+
+### Lo que todavía no genera código
+
+Por ahora se generan los cuádruplos de las expresiones, las asignaciones, `print` y `read`. Los programas con `if`, `while`, funciones, llamadas o `return` también se compilan: se generan las partes lineales que contienen (la condición, los argumentos, los cuerpos), y en el lugar donde irán los saltos y las llamadas aparece una nota que empieza con `·`, por ejemplo `· if (línea 5): aquí irá GotoF t1`. Esas partes se completarán en las siguientes entregas.
+
+### Ejecutar un programa
+
+> _Pendiente (memoria virtual y máquina virtual)._ Esta sección explicará cómo ejecutar un programa compilado, cómo introducir datos con `read` y cómo se muestran los resultados de `print`.
 
 ---
 
