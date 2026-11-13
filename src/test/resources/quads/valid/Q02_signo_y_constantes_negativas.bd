@@ -1,0 +1,30 @@
+// Q02: signo unario y constantes negativas
+program _Q02_;
+var _A_, _X_ : int;
+    _F_ : float;
+main {
+    _X_ = -2;
+    _X_ = -_A_;
+    _X_ = -(_A_ + 1);
+    _X_ = _A_ - -2;
+    _X_ = +_A_;
+    _X_ = -2147483648;
+    _F_ = -3.5 * -(2);
+}
+end
+
+// cuadruplos:
+// 0 = -2 _ _X_
+// 1 UMINUS _A_ _ t1
+// 2 = t1 _ _X_
+// 3 + _A_ 1 t2
+// 4 UMINUS t2 _ t3
+// 5 = t3 _ _X_
+// 6 - _A_ -2 t4
+// 7 = t4 _ _X_
+// 8 = _A_ _ _X_
+// 9 = -2147483648 _ _X_
+// 10 UMINUS 2 _ t5
+// 11 * -3.5 t5 t6
+// 12 = t6 _ _F_
+// 13 END _ _ _

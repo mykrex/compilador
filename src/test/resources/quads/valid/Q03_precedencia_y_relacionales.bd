@@ -1,0 +1,28 @@
+// Q03: precedencia mixta y los cuatro relacionales
+program _Q03_;
+var _A_, _B_, _C_ : int;
+    _F_ : float;
+main {
+    _F_ = _A_ + _B_ * _C_ / 2 - 1.5;
+    print(_A_ + 1 > _B_ * 2, _A_ < _B_, _A_ == _C_, _A_ != 2.5);
+}
+end
+
+// cuadruplos:
+// 0 * _B_ _C_ t1
+// 1 / t1 2 t2
+// 2 + _A_ t2 t3
+// 3 - t3 1.5 t4
+// 4 = t4 _ _F_
+// 5 + _A_ 1 t5
+// 6 * _B_ 2 t6
+// 7 > t5 t6 t7
+// 8 PRINT t7 _ _
+// 9 < _A_ _B_ t8
+// 10 PRINT t8 _ _
+// 11 == _A_ _C_ t9
+// 12 PRINT t9 _ _
+// 13 != _A_ 2.5 t10
+// 14 PRINT t10 _ _
+// 15 PRINTLN _ _ _
+// 16 END _ _ _

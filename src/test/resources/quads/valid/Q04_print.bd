@@ -1,0 +1,25 @@
+// Q04: print con letreros, varios elementos y un PRINTLN por estatuto
+program _Q04_;
+var _A_, _B_ : int;
+main {
+    print("a");
+    print("b");
+    print("total: ", _A_, " y ", _A_ + _B_);
+    print("dice \"hola\"");
+}
+end
+
+// cuadruplos:
+// 0 PRINT "a" _ _
+// 1 PRINTLN _ _ _
+// 2 PRINT "b" _ _
+// 3 PRINTLN _ _ _
+// 4 PRINT "total: " _ _
+// 5 PRINT _A_ _ _
+// 6 PRINT " y " _ _
+// 7 + _A_ _B_ t1
+// 8 PRINT t1 _ _
+// 9 PRINTLN _ _ _
+// 10 PRINT "dice \"hola\"" _ _
+// 11 PRINTLN _ _ _
+// 12 END _ _ _

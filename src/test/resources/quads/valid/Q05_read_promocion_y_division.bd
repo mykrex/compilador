@@ -1,0 +1,24 @@
+// Q05: read, promoción int -> float sin cuádruplo de conversión, y división
+program _Q05_;
+var _A_, _B_ : int;
+    _F_ : float;
+main {
+    read(_A_);
+    read(_F_);
+    _F_ = _A_;
+    _F_ = 7 / 2;
+    _F_ = _A_ / _B_ + _A_ * _B_;
+}
+end
+
+// cuadruplos:
+// 0 READ _ _ _A_
+// 1 READ _ _ _F_
+// 2 = _A_ _ _F_
+// 3 / 7 2 t1
+// 4 = t1 _ _F_
+// 5 / _A_ _B_ t2
+// 6 * _A_ _B_ t3
+// 7 + t2 t3 t4
+// 8 = t4 _ _F_
+// 9 END _ _ _

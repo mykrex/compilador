@@ -1,0 +1,55 @@
+// Q06: if, while, funciones y llamadas: se genera lo lineal y se dejan notas
+program _Q06_;
+var _A_, _B_, _X_ : int;
+int _Doble_(_P_ : int) [ {
+    return _P_ * 2;
+} ];
+void _Muestra_(_V_ : int) [ {
+    print(_V_);
+} ];
+main {
+    _X_ = _A_ * _Doble_(_B_ + 1);
+    if (_X_ > 10) {
+        _Muestra_(_X_);
+    } else {
+        _X_ = 0;
+    };
+    while (_A_ < 3) do {
+        _A_ = _A_ + 1;
+    };
+}
+end
+
+// cuadruplos:
+// 0 * _P_ 2 t1
+// 1 PRINT _V_ _ _
+// 2 PRINTLN _ _ _
+// 3 + _B_ 1 t2
+// 4 * _A_ t3 t4
+// 5 = t4 _ _X_
+// 6 > _X_ 10 t5
+// 7 = 0 _ _X_
+// 8 < _A_ 3 t6
+// 9 + _A_ 1 t7
+// 10 = t7 _ _A_
+// 11 END _ _ _
+// notas:
+// nota: 0 aquí irá Goto a main
+// nota: 0 inicio de la función _Doble_
+// nota: 1 return: aquí irá RETURN t1
+// nota: 1 fin de la función _Doble_: aquí irá ENDFUNC
+// nota: 1 inicio de la función _Muestra_
+// nota: 3 fin de la función _Muestra_: aquí irá ENDFUNC
+// nota: 3 inicio de main: aquí se rellenará el Goto a main
+// nota: 3 llamada a _Doble_ (línea 11): aquí irá ERA _Doble_
+// nota: 4 aquí irá PARAM t2 (argumento 1)
+// nota: 4 aquí irá GOSUB _Doble_; t3 recibirá su valor de retorno
+// nota: 7 if (línea 12): aquí irá GotoF t5
+// nota: 7 llamada a _Muestra_ (línea 13): aquí irá ERA _Muestra_
+// nota: 7 aquí irá PARAM _X_ (argumento 1)
+// nota: 7 aquí irá GOSUB _Muestra_
+// nota: 7 else: aquí irá Goto al final del if y se rellenará el GotoF
+// nota: 8 fin del if: aquí se rellenará el Goto
+// nota: 8 inicio del while (línea 17): destino del Goto de regreso
+// nota: 9 aquí irá GotoF t6
+// nota: 11 fin del while: aquí irá Goto al inicio y se rellenará el GotoF

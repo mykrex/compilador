@@ -93,6 +93,51 @@ class QuadrupleGeneratorTest {
         assertEquals(Type.BOOL, gen.popOperand().type());
     }
 
+    /** Genera {@code left op right} y regresa el temporal resultante (el estilo SYMBOLIC no muestra tipos) */
+    private Operand tempOf(Operand left, Op op, Operand right) {
+        gen.pushOperand(left);
+        gen.pushOperand(right);
+        gen.pushOperator(op, 1, 0);
+        gen.generateBinary();
+        TypedOperand result = gen.popOperand();
+        assertEquals(result.type(), result.operand().type());   // la copia del operando coincide con la pila
+        return result.operand();
+    }
+
+    @Test
+    void cadaTemporalTieneElTipoDelCubo() {
+        Operand i = var("_I_", Type.INT);
+        Operand f = var("_F_", Type.FLOAT);
+
+        Operand sum = tempOf(i, Op.PLUS, i);
+        assertEquals(OperandKind.TEMPORARY, sum.kind());
+        assertEquals(Type.INT, sum.type());                          // int + int
+        assertEquals(Type.FLOAT, tempOf(i, Op.MULT, f).type());      // int * float
+        assertEquals(Type.FLOAT, tempOf(f, Op.MINUS, i).type());     // float - int
+        assertEquals(Type.FLOAT, tempOf(i, Op.DIV, i).type());       // int / int: siempre float
+        assertEquals(Type.FLOAT, tempOf(f, Op.DIV, f).type());
+        assertEquals(Type.BOOL, tempOf(i, Op.LT, f).type());         // relacional
+        assertEquals(Type.BOOL, tempOf(f, Op.EQ, f).type());
+        assertEquals(Type.BOOL, tempOf(i, Op.NEQ, i).type());
+
+        gen.pushOperand(i);
+        gen.generateUnary(Op.MINUS, 1, 0);
+        assertEquals(Type.INT, gen.popOperand().operand().type());   // -int
+        gen.pushOperand(f);
+        gen.generateUnary(Op.MINUS, 1, 0);
+        assertEquals(Type.FLOAT, gen.popOperand().operand().type()); // -float
+        assertTrue(gen.stacksEmpty());
+    }
+
+    @Test
+    void limiteDeLosFlotantes() {
+        // El máximo de double es aproximadamente 1.797e308
+        assertFalse(gen.constant("9".repeat(308) + ".0", Type.FLOAT).isError());   // ~1e308: cabe
+        assertTrue(gen.constant("9".repeat(309) + ".0", Type.FLOAT).isError());    // ~1e309: infinito
+        assertFalse(gen.constant("-2147483648", Type.INT).isError());
+        assertTrue(gen.constant("-2147483649", Type.INT).isError());
+    }
+
     @Test
     void unErrorViajaPorLasPilasSinMasMensajesNiCuadruplos() {
         // operando ya erróneo: no hay cuádruplo y no se reporta otra vez
