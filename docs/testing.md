@@ -7,7 +7,7 @@
 2. [Análisis Léxico](lexico.md)
 3. [Análisis Sintáctico](sintaxis.md)
 4. [Análisis Semántico](semantica.md)
-5. Código Intermedio _(pendiente)_
+5. [Código Intermedio](codigo_intermedio.md)
 6. Memoria Virtual _(pendiente)_
 7. Máquina Virtual _(pendiente)_
 8. [Testing](08_testing.md)
@@ -18,12 +18,14 @@
 
 ## 8.1 Estrategia del Test-Plan
 
-Las pruebas validan por separado las dos fases implementadas:
+Las pruebas validan por separado cada fase implementada:
 
 | Fase       | Clase de prueba   | Qué verifica                                                                         |
 | ---------- | ----------------- | ------------------------------------------------------------------------------------ |
 | Léxica     | `LexerTest.java`  | La secuencia exacta de tokens que genera una entrada, o que produzca un error léxico |
 | Sintáctica | `ParserTest.java` | Que un programa completo se acepte sin errores, o que produzca un error sintáctico   |
+| Semántica  | `SemanticCubeTest`, `VariableTableTest`, `FunctionDirectoryTest`, `SemanticTest` | Estructuras semánticas y programas válidos o con un error semántico (casos en [Análisis Semántico §8](semantica.md)) |
+| Código intermedio | `QuadrupleGeneratorTest`, `QuadrupleTest` | Pilas, fila y tipos de los temporales; fila de cuádruplos de programas completos (§8.6) |
 
 Criterios:
 
@@ -38,10 +40,10 @@ Criterios:
 mvn test
 ```
 
-Resultado esperado:
+Resultado esperado (todas las fases):
 
 ```
-Tests run: 26, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 113, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
@@ -160,9 +162,35 @@ end
 | Bloque `[ ]`                         | S05           | —               |
 | Tokens y expresiones regulares       | L01–L07       | L08–L13         |
 
+## 8.6 Casos de prueba de código intermedio
+
+- `QuadrupleGeneratorTest`: pilas y fila sin el parser (algoritmo con y sin fondo falso, asociatividad, tipo de cada temporal, errores por las pilas, signo, asignación, límites de constantes, códigos de operadores, formato).
+- `QuadrupleTest`, sobre `src/test/resources/quads/`:
+  - **Válidos:** sin errores, y la fila en estilo SYMBOLIC igual al bloque `// cuadruplos:` del archivo (se compara texto, ignorando espacios repetidos; no cambiará con las direcciones).
+  - **Notas (Q06):** la lista de notas y su posición, contra las líneas `// nota:`.
+  - **Inválidos:** cada `// esperado:` es un error semántico, en orden, y la fila es nula.
+
+```
+_X_ = _A_ * (_B_ + _C_);        // en Q01
+// cuadruplos:
+// 0 + _B_ _C_ t1
+// 1 * _A_ t1 t2
+// 2 = t2 _ _X_
+```
+
+| ID  | Qué valida | Resultado |
+| --- | ---------- | --------- |
+| Q01 | `_A_ * (_B_ + _C_)`, `(_A_ + _B_) * _C_`, `_A_ - (_B_ - _C_)`, `_A_ - _B_ - _C_` | ✅ |
+| Q02 | `-2`, `-_A_`, `-(_A_ + 1)`, `_A_ - -2`, `+_A_`, `-2147483648`, `-(2)` | ✅ |
+| Q03 | Precedencia mixta y los cuatro relacionales en `print` | ✅ |
+| Q04 | Letreros, varios elementos, escapes y un `PRINTLN` por estatuto | ✅ |
+| Q05 | `read`, promoción `int → float` sin conversión y división | ✅ |
+| Q06 | Funciones, llamada con fondo falso en el argumento, `if`/`else`, `while`; notas | ✅ |
+| Q07 | `2147483648` y un flotante de 309 dígitos no caben: dos errores, fila nula | ✅ |
+
 ---
 
 ## Navegación
 
-- Anterior: [← Análisis Sintáctico](03_sintaxis.md)
+- Anterior: [← Código Intermedio](codigo_intermedio.md)
 - Siguiente: [Herramientas de IA →](09_herramientas_ia.md)
