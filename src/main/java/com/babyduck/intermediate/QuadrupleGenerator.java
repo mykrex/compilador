@@ -133,6 +133,24 @@ public final class QuadrupleGenerator {
         return new Operand(OperandKind.QUAD_INDEX, String.valueOf(index), null, null, -1);
     }
 
+    /** Nombre de una función como operando de ERA y GOSUB (sin tipo ni dirección) */
+    public Operand function(String name) {
+        return new Operand(OperandKind.FUNCTION, name, null, null, -1);
+    }
+
+    /** Número de parámetro (desde 1) como resultado de PARAM (sin tipo ni dirección) */
+    public Operand paramIndex(int k) {
+        return new Operand(OperandKind.PARAM_INDEX, String.valueOf(k), null, null, -1);
+    }
+
+    /**
+     * Dirección global donde una función con valor deja su resultado; se muestra con el
+     * nombre de la función, por ejemplo 1002(_F_)
+     */
+    public Operand returnSlot(String function, Type type, int address) {
+        return new Operand(OperandKind.VARIABLE, function, type, null, address);
+    }
+
     // Pilas de operandos y de tipos (siempre juntas)
 
     public void pushOperand(Operand operand) {
@@ -335,9 +353,60 @@ public final class QuadrupleGenerator {
         queue.fill(jump, quadIndex(target));
     }
 
-    /** Nota en la posición actual de la fila: texto que se muestra antes del próximo cuádruplo */
-    public void note(String text) {
-        queue.addNote(text);
+    // Programa y funciones
+
+    /** Inicio del programa: (GOTO, _, _, ?) siempre en el cuádruplo 0; se rellena al llegar a main */
+    public void startProgram() {
+        jumps.push(emit(QuadOp.GOTO, null, null, null));
+    }
+
+    /** Inicio de main: el GOTO del cuádruplo 0 se rellena con el siguiente cuádruplo */
+    public void startMain() {
+        fillJump(jumps.pop(), queue.nextIndex());
+    }
+
+    /** Fin de una función: (ENDFUNC, _, _, _) */
+    public void emitEndFunc() {
+        emit(QuadOp.ENDFUNC, null, null, null);
+    }
+
+    /**
+     * return: (RETURN, valor, _, dirección de regreso), o (RETURN, _, _, _) en una función void.
+     * Regresa al llamador en ese momento
+     *
+     * @param value el valor, o null en {@code return;}
+     * @param slot  la dirección de regreso de la función, o null si es void
+     */
+    public void emitReturn(Operand value, Operand slot) {
+        emit(QuadOp.RETURN, value, null, slot);
+    }
+
+    /** Llamada, después de evaluar los argumentos: (ERA, función, _, _) prepara su memoria */
+    public void emitEra(String function) {
+        emit(QuadOp.ERA, function(function), null, null);
+    }
+
+    /** (PARAM, argumento, _, k): copia el argumento al parámetro k (desde 1) */
+    public void emitParam(Operand argument, int k) {
+        if (!argument.isError()) {
+            emit(QuadOp.PARAM, argument, null, paramIndex(k));
+        }
+    }
+
+    /** (GOSUB, función, _, inicio): salta al primer cuádruplo de la función */
+    public void emitGosub(String function, int startQuad) {
+        emit(QuadOp.GOSUB, function(function), null, quadIndex(startQuad));
+    }
+
+    /**
+     * Llamada dentro de una expresión, después del GOSUB: (=, dirección de regreso, _, temporal)
+     * y el temporal entra a las pilas. Cada llamada usa su propio temporal, así
+     * {@code f(5) + f(3)} no pierde el primer valor
+     */
+    public void emitCallResult(Operand slot) {
+        Operand temp = newTemp(slot.type());
+        emit(QuadOp.ASSIGN, slot, null, temp);
+        pushOperand(temp);
     }
 
     /** true si las tres pilas están vacías (al terminar cada estatuto deben estarlo) */

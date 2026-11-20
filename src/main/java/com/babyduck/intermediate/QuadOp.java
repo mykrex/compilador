@@ -28,7 +28,12 @@ public enum QuadOp {
     READ(13, "READ"),
     END(14, "END"),
     GOTO(15, "GOTO"),
-    GOTOF(16, "GOTOF");
+    GOTOF(16, "GOTOF"),
+    ERA(17, "ERA"),
+    PARAM(18, "PARAM"),
+    GOSUB(19, "GOSUB"),
+    RETURN(20, "RETURN"),
+    ENDFUNC(21, "ENDFUNC");
 
     private final int code;
     private final String symbol;

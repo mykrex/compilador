@@ -225,15 +225,13 @@ class QuadrupleGeneratorTest {
 
     @Test
     void estatutosYFormatoDeLaFila() {
-        Operand x = var("_X_", Type.INT);
+        Operand x = var("_X_", Type.INT);                        // global: 1000
         gen.emitRead(x);
-        gen.note("if (línea 3): aquí irá GotoF");
-        gen.emitPrint(gen.string("\"x =\""));
+        gen.emitPrint(gen.string("\"x =\""));                    // letrero: 10000
         gen.emitPrint(x);
         gen.emitPrint(Operand.ERROR);                            // no genera nada
         gen.emitPrintln();
         gen.emitEnd();
-        gen.note("al final");
 
         assertEquals("""
                 0 READ _ _ _X_
@@ -241,14 +239,19 @@ class QuadrupleGeneratorTest {
                 2 PRINT _X_ _ _
                 3 PRINTLN _ _ _
                 4 END _ _ _
-                """, listing());                                 // SYMBOLIC no lleva notas
+                """, listing());
 
         String full = gen.queue().format(QuadrupleQueue.Style.FULL);
         assertTrue(full.startsWith("#  op"));
-        assertTrue(full.indexOf("· if (línea 3)") > full.indexOf("READ"));
-        assertTrue(full.indexOf("· if (línea 3)") < full.indexOf("PRINT"));
-        assertTrue(full.trim().endsWith("· al final"));
-        assertEquals(1, gen.queue().notes().get(0).position());
+        assertTrue(full.contains("1000(_X_)"));                  // FULL: dirección(nombre)
+        assertTrue(full.contains("10000(\"x =\")"));
+        assertEquals("""
+                0 13 _ _ 1000
+                1 11 10000 _ _
+                2 11 1000 _ _
+                3 12 _ _ _
+                4 14 _ _ _
+                """, gen.queue().format(QuadrupleQueue.Style.ADDRESS));
     }
 
     /** while (_A_ < 3) { if (_A_ > 1) {...} else {...} }: cada salto apunta a su destino */

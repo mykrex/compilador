@@ -1,10 +1,8 @@
 package com.babyduck;
 
-import com.babyduck.intermediate.Note;
 import com.babyduck.intermediate.QuadrupleQueue;
 import org.antlr.v4.runtime.CharStreams;
 import org.junit.jupiter.api.DynamicTest;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestFactory;
 
 import java.io.IOException;
@@ -24,14 +22,12 @@ import static org.junit.jupiter.api.Assertions.*;
  *   texto impreso, nunca objetos con equals. Si el archivo trae el bloque
  *   {@code // direcciones:}, también se compara la fila en estilo ADDRESS (códigos y direcciones)
  * invalid: cada línea {@code // esperado: ...} es un error semántico, en orden, y la fila es null
- * Q06 además compara las notas con su bloque {@code // nota: posición texto}
  */
 class QuadrupleTest {
 
     private static final Path BASE = Path.of("src/test/resources/quads");
     private static final String QUADS_MARK = "// cuadruplos:";
     private static final String ADDRESS_MARK = "// direcciones:";
-    private static final String NOTE_PREFIX = "// nota:";
     private static final String EXPECTED_PREFIX = "// esperado:";
 
     @TestFactory
@@ -53,27 +49,6 @@ class QuadrupleTest {
                 assertEquals(String.join("\n", expectedAddresses), String.join("\n", actualAddresses));
             }
         }));
-    }
-
-    /** Las notas de lo que se generará en entregas siguientes existen y están en su posición */
-    @Test
-    void notasDeQ06() throws IOException {
-        Path path = BASE.resolve("valid/Q06_estatutos_de_entregas_siguientes.bd");
-        BabyDuckAnalyzer.Result result = BabyDuckAnalyzer.compile(CharStreams.fromPath(path));
-        assertTrue(result.isValid(), () -> "Errores inesperados: " + result.errors());
-
-        List<String> expected = new ArrayList<>();
-        for (String line : Files.readAllLines(path)) {
-            if (line.strip().startsWith(NOTE_PREFIX)) {
-                expected.add(line.strip().substring(NOTE_PREFIX.length()).strip());
-            }
-        }
-        assertFalse(expected.isEmpty(), "Faltan las líneas '" + NOTE_PREFIX + "' en Q06");
-        List<String> actual = new ArrayList<>();
-        for (Note note : result.quadruples().notes()) {
-            actual.add(note.position() + " " + note.text());
-        }
-        assertEquals(String.join("\n", expected), String.join("\n", actual));
     }
 
     @TestFactory

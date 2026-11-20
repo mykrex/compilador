@@ -13,13 +13,24 @@ import java.util.List;
  *  -{@code locals}: tabla de la función, para buscarlo por nombre dentro del cuerpo
  *       y detectar si una variable local repite su nombre
  * Ambas guardan el "mismo objeto" {@link VariableInfo}, no una copia
+ *
+ * Al terminar de compilar la función se guardan su cuádruplo de inicio, la cantidad de
+ * locales y temporales por tipo, y se libera la tabla local: lo que necesita una llamada
+ * (parámetros con su dirección, inicio, tamaño y dirección de regreso) queda aquí
  */
 public final class FunctionInfo {
+
+    /** Valor de los datos que todavía no se conocen (inicio, dirección de regreso de una void) */
+    public static final int UNKNOWN = -1;
 
     private final String name;
     private final Type returnType;
     private final List<VariableInfo> params = new ArrayList<>();
     private final VariableTable locals = new VariableTable();
+    private int returnAddress = UNKNOWN;      // dirección global donde deja su valor (no void)
+    private int startQuad = UNKNOWN;          // número del primer cuádruplo de su cuerpo
+    private MemorySize localSize = MemorySize.EMPTY;
+    private MemorySize tempSize = MemorySize.EMPTY;
 
     public FunctionInfo(String name, Type returnType) {
         this.name = name;
@@ -66,15 +77,56 @@ public final class FunctionInfo {
         return params.size();
     }
 
-    /** Tabla con parámetros y variables locales */
+    /** Tabla con parámetros y variables locales (vacía después de {@link #releaseLocals()}) */
     public VariableTable locals() {
         return locals;
+    }
+
+    public int returnAddress() {
+        return returnAddress;
+    }
+
+    public void setReturnAddress(int address) {
+        this.returnAddress = address;
+    }
+
+    public int startQuad() {
+        return startQuad;
+    }
+
+    public void setStartQuad(int quad) {
+        this.startQuad = quad;
+    }
+
+    public MemorySize localSize() {
+        return localSize;
+    }
+
+    public MemorySize tempSize() {
+        return tempSize;
+    }
+
+    /** Guarda cuántas locales (incluye parámetros) y temporales de cada tipo usa la función */
+    public void setSizes(MemorySize locals, MemorySize temps) {
+        this.localSize = locals;
+        this.tempSize = temps;
+    }
+
+    /**
+     * Libera la tabla local al terminar de compilar la función. Los parámetros siguen en la
+     * lista ordenada, con su dirección, para validar y generar las llamadas
+     */
+    public void releaseLocals() {
+        locals.clear();
     }
 
     @Override
     public String toString() {
         return name + " -> " + returnType.display()
-                + "\n  params:  " + params
-                + "\n  locales: " + locals;
+                + (returnAddress != UNKNOWN ? " (regreso en " + returnAddress + ")" : "")
+                + "\n  inicio:      " + startQuad
+                + "\n  params:      " + params
+                + "\n  locales:     " + localSize
+                + "\n  temporales:  " + tempSize;
     }
 }

@@ -1,0 +1,82 @@
+// Q06: funciones void y con valor, llamadas como estatuto y dentro de una expresión, if-else y while
+program _Q06_;
+var _A_, _B_, _X_ : int;
+int _Doble_(_P_ : int) [ {
+    return _P_ * 2;
+} ];
+void _Muestra_(_V_ : int) [ {
+    print(_V_);
+} ];
+main {
+    _X_ = _A_ * _Doble_(_B_ + 1);
+    if (_X_ > 10) {
+        _Muestra_(_X_);
+    } else {
+        _X_ = 0;
+    };
+    while (_A_ < 3) do {
+        _A_ = _A_ + 1;
+    };
+}
+end
+
+// Globales: _A_ 1000, _B_ 1001, _X_ 1002; regreso de _Doble_ en 1003 (global int).
+// _P_ y _V_ reciben 3000: cada función usa sus locales desde la base.
+
+// cuadruplos:
+// 0 GOTO _ _ 7
+// 1 * _P_ 2 t1
+// 2 RETURN t1 _ _Doble_
+// 3 ENDFUNC _ _ _
+// 4 PRINT _V_ _ _
+// 5 PRINTLN _ _ _
+// 6 ENDFUNC _ _ _
+// 7 + _B_ 1 t2
+// 8 ERA _Doble_ _ _
+// 9 PARAM t2 _ 1
+// 10 GOSUB _Doble_ _ 1
+// 11 = _Doble_ _ t3
+// 12 * _A_ t3 t4
+// 13 = t4 _ _X_
+// 14 > _X_ 10 t5
+// 15 GOTOF t5 _ 20
+// 16 ERA _Muestra_ _ _
+// 17 PARAM _X_ _ 1
+// 18 GOSUB _Muestra_ _ 4
+// 19 GOTO _ _ 21
+// 20 = 0 _ _X_
+// 21 < _A_ 3 t6
+// 22 GOTOF t6 _ 26
+// 23 + _A_ 1 t7
+// 24 = t7 _ _A_
+// 25 GOTO _ _ 21
+// 26 END _ _ _
+
+// direcciones:
+// 0 15 _ _ 7
+// 1 3 3000 8000 5000
+// 2 20 5000 _ 1003
+// 3 21 _ _ _
+// 4 11 3000 _ _
+// 5 12 _ _ _
+// 6 21 _ _ _
+// 7 1 1001 8001 5000
+// 8 17 _Doble_ _ _
+// 9 18 5000 _ 1
+// 10 19 _Doble_ _ 1
+// 11 9 1003 _ 5001
+// 12 3 1000 5001 5002
+// 13 9 5002 _ 1002
+// 14 5 1002 8002 7000
+// 15 16 7000 _ 20
+// 16 17 _Muestra_ _ _
+// 17 18 1002 _ 1
+// 18 19 _Muestra_ _ 4
+// 19 15 _ _ 21
+// 20 9 8003 _ 1002
+// 21 6 1000 8004 7001
+// 22 16 7001 _ 26
+// 23 1 1000 8001 5003
+// 24 9 5003 _ 1000
+// 25 15 _ _ 21
+// 26 14 _ _ _

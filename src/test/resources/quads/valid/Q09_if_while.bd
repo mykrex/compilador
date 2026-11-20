@@ -19,47 +19,50 @@ main {
 }
 end
 
-// if sin else: el GOTOF (1) salta al cuádruplo que sigue al cuerpo (3).
-// if-else: el GOTOF (4) salta al else (7) y el GOTO (6) salta al final (8).
-// while: el GOTO (16) regresa a la condición (8) y el GOTOF (9) sale del ciclo (17);
-// el if anidado (11) salta dentro del cuerpo del while (14).
+// El cuádruplo 0 salta a main (1).
+// if sin else: el GOTOF (2) salta al cuádruplo que sigue al cuerpo (4).
+// if-else: el GOTOF (5) salta al else (8) y el GOTO (7) salta al final (9).
+// while: el GOTO (17) regresa a la condición (9) y el GOTOF (10) sale del ciclo (18);
+// el if anidado (12) salta dentro del cuerpo del while (15).
 
 // cuadruplos:
-// 0 > _A_ 0 t1
-// 1 GOTOF t1 _ 3
-// 2 = 1 _ _B_
-// 3 < _A_ _B_ t2
-// 4 GOTOF t2 _ 7
-// 5 = 2 _ _A_
-// 6 GOTO _ _ 8
-// 7 = 3 _ _A_
-// 8 != _A_ 0 t3
-// 9 GOTOF t3 _ 17
-// 10 > _A_ 5 t4
-// 11 GOTOF t4 _ 14
-// 12 PRINT _A_ _ _
-// 13 PRINTLN _ _ _
-// 14 - _A_ 1 t5
-// 15 = t5 _ _A_
-// 16 GOTO _ _ 8
-// 17 END _ _ _
+// 0 GOTO _ _ 1
+// 1 > _A_ 0 t1
+// 2 GOTOF t1 _ 4
+// 3 = 1 _ _B_
+// 4 < _A_ _B_ t2
+// 5 GOTOF t2 _ 8
+// 6 = 2 _ _A_
+// 7 GOTO _ _ 9
+// 8 = 3 _ _A_
+// 9 != _A_ 0 t3
+// 10 GOTOF t3 _ 18
+// 11 > _A_ 5 t4
+// 12 GOTOF t4 _ 15
+// 13 PRINT _A_ _ _
+// 14 PRINTLN _ _ _
+// 15 - _A_ 1 t5
+// 16 = t5 _ _A_
+// 17 GOTO _ _ 9
+// 18 END _ _ _
 
 // direcciones:
-// 0 5 1000 8000 7000
-// 1 16 7000 _ 3
-// 2 9 8001 _ 1001
-// 3 6 1000 1001 7001
-// 4 16 7001 _ 7
-// 5 9 8002 _ 1000
-// 6 15 _ _ 8
-// 7 9 8003 _ 1000
-// 8 8 1000 8000 7002
-// 9 16 7002 _ 17
-// 10 5 1000 8004 7003
-// 11 16 7003 _ 14
-// 12 11 1000 _ _
-// 13 12 _ _ _
-// 14 2 1000 8001 5000
-// 15 9 5000 _ 1000
-// 16 15 _ _ 8
-// 17 14 _ _ _
+// 0 15 _ _ 1
+// 1 5 1000 8000 7000
+// 2 16 7000 _ 4
+// 3 9 8001 _ 1001
+// 4 6 1000 1001 7001
+// 5 16 7001 _ 8
+// 6 9 8002 _ 1000
+// 7 15 _ _ 9
+// 8 9 8003 _ 1000
+// 9 8 1000 8000 7002
+// 10 16 7002 _ 18
+// 11 5 1000 8004 7003
+// 12 16 7003 _ 15
+// 13 11 1000 _ _
+// 14 12 _ _ _
+// 15 2 1000 8001 5000
+// 16 9 5000 _ 1000
+// 17 15 _ _ 9
+// 18 14 _ _ _

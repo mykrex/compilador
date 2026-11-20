@@ -38,6 +38,11 @@ public final class VariableTable {
         return variables.size();
     }
 
+    /** Vacía la tabla (al terminar de compilar una función se libera su tabla local) */
+    public void clear() {
+        variables.clear();
+    }
+
     /** Todas las variables, en orden de declaración (solo lectura) */
     public Collection<VariableInfo> all() {
         return Collections.unmodifiableCollection(variables.values());

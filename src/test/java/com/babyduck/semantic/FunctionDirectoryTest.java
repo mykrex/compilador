@@ -29,6 +29,27 @@ class FunctionDirectoryTest {
         assertSame(f.params().get(0), f.locals().get("_A_"));
     }
 
+    /** Al terminar la función se libera su tabla local; quedan parámetros, inicio y tamaños */
+    @Test
+    void releaseLocalsKeepsWhatACallNeeds() {
+        FunctionInfo f = new FunctionInfo("_Suma_", Type.INT);
+        f.addParam(new VariableInfo("_A_", Type.INT, 3000));
+        f.addParam(new VariableInfo("_B_", Type.FLOAT, 4000));
+        f.addLocal(new VariableInfo("_C_", Type.INT, 3001));
+        f.setReturnAddress(1000);
+        f.setStartQuad(1);
+        f.setSizes(new MemorySize(2, 1, 0), new MemorySize(1, 0, 1));
+
+        f.releaseLocals();
+        assertEquals(0, f.locals().size());
+        assertEquals(2, f.paramCount());
+        assertEquals(4000, f.params().get(1).address());
+        assertEquals(1000, f.returnAddress());
+        assertEquals(1, f.startQuad());
+        assertEquals(new MemorySize(2, 1, 0), f.localSize());
+        assertEquals(new MemorySize(1, 0, 1), f.tempSize());
+    }
+
     @Test
     void duplicateParamIsRejected() {
         FunctionInfo f = new FunctionInfo("_F_", Type.VOID);

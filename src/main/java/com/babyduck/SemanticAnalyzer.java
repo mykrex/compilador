@@ -7,9 +7,11 @@ import com.babyduck.intermediate.QuadrupleGenerator;
 import com.babyduck.intermediate.QuadrupleQueue;
 import com.babyduck.intermediate.Segment;
 import com.babyduck.intermediate.TypedOperand;
+import com.babyduck.intermediate.VirtualMemory;
 import com.babyduck.semantic.FunctionDirectory;
 import com.babyduck.semantic.FunctionDirectory.NameKind;
 import com.babyduck.semantic.FunctionInfo;
+import com.babyduck.semantic.MemorySize;
 import com.babyduck.semantic.Op;
 import com.babyduck.semantic.SemanticCube;
 import com.babyduck.semantic.Type;
@@ -17,6 +19,7 @@ import com.babyduck.semantic.VariableInfo;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.TerminalNode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -66,25 +69,23 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
 
     @Override
     public Void visitProgram(BabyDuckParser.ProgramContext ctx) {
-        directory.setProgramName(ctx.ID().getText());
-        boolean hasFunctions = !ctx.funcDecl().isEmpty();
-        if (hasFunctions) {
-            generator.note("aquí irá Goto a main");
-        }
+        directory.setProgramName(ctx.ID().getText());                    // punto 2: nombre del programa
+        generator.startProgram();                                        // punto 1: GOTO a main pendiente en el cuádruplo 0
         if (ctx.vars() != null) {
             visit(ctx.vars());                                           // globales
         }
         for (BabyDuckParser.FuncDeclContext function : ctx.funcDecl()) {
             visit(function);
         }
+        // punto 3: inicio de main
         currentFunction = null;                                          // main solo ve globales
-        generator.memory().startScope();                                 // inicio de main: temporales desde la base
-        if (hasFunctions) {
-            generator.note("inicio de main: aquí se rellenará el Goto a main");
-        }
+        generator.memory().startScope();                                 // temporales desde la base
+        generator.startMain();                                           // se rellena el GOTO del cuádruplo 0
         visit(ctx.body());
-        generator.emitEnd();                                             // fin del programa
-        return null;                                                     // las tablas se conservan
+        // punto 4: fin del programa (END y tamaño del segmento global y de los temporales de main)
+        generator.emitEnd();
+        directory.setSizes(sizeOf(Segment.GLOBAL), sizeOf(Segment.TEMPORARY));
+        return null;                                                     // la tabla de globales se conserva
     }
 
     // Variables
@@ -94,7 +95,7 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
     public Void visitVarDecl(BabyDuckParser.VarDeclContext ctx) {
         Type type = Type.fromKeyword(ctx.type().getText());
         for (TerminalNode id : ctx.ID()) {
-            declareVariable(id.getSymbol(), type, false);
+            declareVariable(id.getSymbol(), type, false);                // punto 5: declarar con dirección
         }
         return null;
     }
@@ -108,6 +109,7 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
         Type returnType = Type.fromKeyword(ctx.funcType().getText());
         FunctionInfo function = new FunctionInfo(name, returnType);      // ya trae su tabla
 
+        // punto 6: registrar la función (dirección de regreso, todos los caminos, alcance nuevo)
         // Se registra antes de los parámetros y el cuerpo, así puede llamarse a sí misma
         NameKind use = directory.globalUse(name);
         if (use == NameKind.FUNCTION) {
@@ -118,6 +120,12 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
             directory.addFunction(function);
         }
         // Aunque el nombre esté repetido, se revisa su contenido para reportar todos los errores
+
+        // Dirección de regreso: una función con valor deja su resultado en una dirección global
+        if (returnType != Type.VOID) {
+            function.setReturnAddress(generator.memory().allocate(Segment.GLOBAL, returnType));
+            reportMemoryOverflow(nameToken);
+        }
 
         // Una función con valor debe regresar en todos los caminos. Se revisa antes del
         // cuerpo porque solo inspecciona el árbol, y así el error sale en orden de línea
@@ -133,10 +141,13 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
         if (ctx.vars() != null) {
             visit(ctx.vars());                                           // variables locales
         }
-        generator.note("inicio de la función " + name);
+        function.setStartQuad(generator.queue().nextIndex());            // punto 8: inicio de la función
         visit(ctx.body());
-        generator.note("fin de la función " + name + ": aquí irá ENDFUNC");
-        currentFunction = null;                                          // la tabla se conserva
+        // punto 9: fin de la función: ENDFUNC, tamaño (antes del siguiente startScope) y se libera su tabla local
+        generator.emitEndFunc();
+        function.setSizes(sizeOf(Segment.LOCAL), sizeOf(Segment.TEMPORARY));
+        function.releaseLocals();
+        currentFunction = null;
         return null;
     }
 
@@ -144,7 +155,7 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
     @Override
     public Void visitParam(BabyDuckParser.ParamContext ctx) {
         Type type = Type.fromKeyword(ctx.type().getText());
-        declareVariable(ctx.ID().getSymbol(), type, true);
+        declareVariable(ctx.ID().getSymbol(), type, true);               // punto 7: parámetro con dirección local
         return null;
     }
 
@@ -177,10 +188,11 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
     @Override
     public Void visitAssign(BabyDuckParser.AssignContext ctx) {
         Token target = ctx.ID().getSymbol();
-        Operand destination = variableOperand(target);
+        Operand destination = variableOperand(target);                   // punto 10: validar el destino
         visit(ctx.expression());
         Token assign = ctx.ASSIGN().getSymbol();
-        Outcome outcome = generator.generateAssign(destination, assign.getLine(), assign.getCharPositionInLine());
+        Outcome outcome = generator.generateAssign(destination,          // punto 11: cubo y cuádruplo =
+                assign.getLine(), assign.getCharPositionInLine());
         if (outcome.failed()) {
             error(assign, "no se puede asignar " + outcome.right().display()
                     + " a " + target.getText() + ", que es " + outcome.left().display());
@@ -195,13 +207,13 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
     @Override
     public Void visitCondition(BabyDuckParser.ConditionContext ctx) {
         TypedOperand condition = checkCondition(ctx.expression(), "if");
-        generator.startIf(condition.operand());                          // if: GOTOF después de la condición
+        generator.startIf(condition.operand());                          // punto 12: condición bool y GOTOF
         visit(ctx.body(0));
         if (ctx.ELSE() != null) {
-            generator.startElse();                                       // else: GOTO y se rellena el GOTOF
+            generator.startElse();                                       // punto 13: GOTO y se rellena el GOTOF
             visit(ctx.body(1));
         }
-        generator.endIf();                                               // fin del if: se rellena el salto pendiente
+        generator.endIf();                                               // punto 14: se rellena el salto pendiente
         return null;
     }
 
@@ -211,18 +223,18 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
      */
     @Override
     public Void visitCycle(BabyDuckParser.CycleContext ctx) {
-        generator.markLoopStart();                                       // while: inicio de la condición
+        generator.markLoopStart();                                       // punto 15: regreso (inicio de la condición)
         TypedOperand condition = checkCondition(ctx.expression(), "while");
-        generator.startLoopBody(condition.operand());                    // while: GOTOF después de la condición
+        generator.startLoopBody(condition.operand());                    // punto 12: condición bool y GOTOF
         visit(ctx.body());
-        generator.endLoop();                                             // fin del while: GOTO al inicio y se rellena el GOTOF
+        generator.endLoop();                                             // punto 16: GOTO al regreso y se rellena el GOTOF
         return null;
     }
 
     /** {@code read(_X_);} — solo puede leer en una variable declarada */
     @Override
     public Void visitRead(BabyDuckParser.ReadContext ctx) {
-        generator.emitRead(variableOperand(ctx.ID().getSymbol()));
+        generator.emitRead(variableOperand(ctx.ID().getSymbol()));       // punto 24: READ
         return null;
     }
 
@@ -231,13 +243,13 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
     public Void visitPrint(BabyDuckParser.PrintContext ctx) {
         for (BabyDuckParser.PrintItemContext item : ctx.printItem()) {
             if (item.CTE_STRING() != null) {
-                generator.emitPrint(generator.string(item.CTE_STRING().getText()));
+                generator.emitPrint(generator.string(item.CTE_STRING().getText()));   // punto 22: PRINT
             } else {
                 // acepta BOOL; una función void dentro de print ya la reporta checkCall
-                generator.emitPrint(evaluate(item.expression()).operand());
+                generator.emitPrint(evaluate(item.expression()).operand());           // punto 22: PRINT
             }
         }
-        generator.emitPrintln();
+        generator.emitPrintln();                                         // punto 23: PRINTLN
         return null;
     }
 
@@ -248,7 +260,7 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
         return null;
     }
 
-    /** Reglas de return; el cuádruplo RETURN llega con las funciones */
+    /** Punto 25: reglas de return y su cuádruplo RETURN (regresa al llamador en ese momento) */
     @Override
     public Void visitReturnStmt(BabyDuckParser.ReturnStmtContext ctx) {
         Token keyword = ctx.RETURN().getSymbol();
@@ -267,7 +279,9 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
                 error(keyword, "la función " + name + " es void, no puede regresar un valor");
                 evaluate(value);
             }
-            generator.note("return: aquí irá el regreso de " + name);
+            if (value == null) {
+                generator.emitReturn(null, null);                        // return; en void: RETURN _ _ _
+            }
             return null;                                                 // return; en void es válido
         }
         if (value == null) {
@@ -278,8 +292,11 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
         if (!result.isError() && !cube.canAssign(returnType, result.type())) {
             error(value.getStart(), "la función " + name + " regresa " + returnType.display()
                     + ", no puede regresar " + result.type().display());
+        } else if (!result.isError()) {
+            // return con valor: RETURN valor _ dirección de regreso (global de la función)
+            generator.emitReturn(result.operand(),
+                    generator.returnSlot(name, returnType, currentFunction.returnAddress()));
         }
-        generator.note("return: aquí irá RETURN " + result.operand());
         return null;
     }
 
@@ -291,10 +308,10 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
     public Void visitExpression(BabyDuckParser.ExpressionContext ctx) {
         visit(ctx.exp(0));
         if (ctx.relOp() != null) {
-            pushOperator(ctx.relOp().getStart());
+            pushOperator(ctx.relOp().getStart());                        // punto 26: meter el operador
             visit(ctx.exp(1));
             if (generator.topIs(Op.GT, Op.LT, Op.EQ, Op.NEQ)) {
-                report(generator.generateBinary());
+                report(generator.generateBinary());                      // punto 27: cuádruplo relacional
             }
         }
         return null;
@@ -305,11 +322,11 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
     public Void visitExp(BabyDuckParser.ExpContext ctx) {
         for (int i = 0; i < ctx.term().size(); i++) {
             if (i > 0) {
-                pushOperator(operatorBefore(ctx, i));
+                pushOperator(operatorBefore(ctx, i));                    // punto 26: meter el operador
             }
             visit(ctx.term(i));
             if (generator.topIs(Op.PLUS, Op.MINUS)) {
-                report(generator.generateBinary());
+                report(generator.generateBinary());                      // punto 28: cuádruplo + -
             }
         }
         return null;
@@ -320,11 +337,11 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
     public Void visitTerm(BabyDuckParser.TermContext ctx) {
         for (int i = 0; i < ctx.factor().size(); i++) {
             if (i > 0) {
-                pushOperator(operatorBefore(ctx, i));
+                pushOperator(operatorBefore(ctx, i));                    // punto 26: meter el operador
             }
             visit(ctx.factor(i));
             if (generator.topIs(Op.MULT, Op.DIV)) {
-                report(generator.generateBinary());
+                report(generator.generateBinary());                      // punto 28: cuádruplo * /
             }
         }
         return null;
@@ -336,20 +353,20 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
         TerminalNode sign = (ctx.MINUS() != null) ? ctx.MINUS() : ctx.PLUS();
 
         if (ctx.cte() != null) {
-            pushConstant(ctx.cte(), sign);                               // el signo va con la constante
+            pushConstant(ctx.cte(), sign);                               // punto 29 (el signo va con la constante)
             return null;
         }
         if (ctx.expression() != null) {
-            generator.pushFakeBottom();                                  // (
+            generator.pushFakeBottom();                                  // punto 18: fondo falso en (
             visit(ctx.expression());
-            generator.popFakeBottom();                                   // )
+            generator.popFakeBottom();                                   // punto 19: se quita en )
         } else if (ctx.funcCall() != null) {
-            checkCall(ctx.funcCall(), true);
+            checkCall(ctx.funcCall(), true);                             // punto 29: deja el temporal del regreso
         } else {
-            generator.pushOperand(variableOperand(ctx.ID().getSymbol()));
+            generator.pushOperand(variableOperand(ctx.ID().getSymbol())); // punto 29: operando con dirección
         }
 
-        if (sign != null) {
+        if (sign != null) {                                              // punto 30: signo unario
             Token signToken = sign.getSymbol();
             Outcome outcome = generator.generateUnary(Op.fromSymbol(sign.getText()),
                     signToken.getLine(), signToken.getCharPositionInLine());
@@ -467,16 +484,17 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
 
     /** Un argumento se evalúa entre fondos falsos, para que no use operadores de afuera */
     private TypedOperand evaluateArgument(BabyDuckParser.ExpressionContext argument) {
-        generator.pushFakeBottom();
+        generator.pushFakeBottom();                                      // punto 18: fondo falso
         visit(argument);
-        generator.popFakeBottom();
+        generator.popFakeBottom();                                       // punto 19: se quita
         return generator.popOperand();
     }
 
     /**
      * Revisa una llamada. Los errores salen en orden: primero los del nombre,
-     * después los de cada argumento. Los cuádruplos de la llamada (ERA, PARAM, GOSUB)
-     * llegan con las funciones; por ahora se marcan con notas
+     * después los de cada argumento. Primero se evalúan todos los argumentos y después se
+     * generan ERA, un PARAM por argumento (en orden, desde 1) y GOSUB: así una llamada
+     * anidada, como f(g(1)), termina completa antes del ERA de f
      *
      * @param inExpression {@code true} si la llamada está dentro de una expresión: entonces
      *                     deja en las pilas un temporal con el tipo de retorno, o ERROR
@@ -487,6 +505,7 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
         List<BabyDuckParser.ExpressionContext> args = ctx.expression();
         FunctionInfo function = directory.getFunction(name);
 
+        // punto 17: validar la función (existe, no void en expresión, número de argumentos)
         if (function == null) {
             if (directory.lookupVariable(name, currentFunction) != null) {
                 error(nameToken, name + " es una variable, no una función");
@@ -507,8 +526,8 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
             error(nameToken, "la función " + name + " es void y no devuelve un valor");
         }
 
-        generator.note("llamada a " + name + " (línea " + nameToken.getLine() + "): aquí irá ERA " + name);
         int expected = function.paramCount();
+        List<Operand> values = new ArrayList<>();                        // resultado de cada argumento
         if (args.size() != expected) {
             // Un solo error por llamada: con otro número de argumentos no se comparan los tipos
             error(nameToken, name + " espera " + expected
@@ -522,19 +541,33 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
                     error(args.get(i).getStart(), "argumento " + (i + 1) + " de " + name
                             + ": no se puede pasar " + arg.type().display() + " a " + paramType.display());
                 }
-                generator.note("aquí irá PARAM " + arg.operand() + " (argumento " + (i + 1) + ")");
+                values.add(arg.operand());                               // punto 20: guardar y revisar el argumento
             }
         }
 
+        // punto 21: ERA, PARAM por argumento, GOSUB y, en expresión, copia del regreso
+        generator.emitEra(name);                                         // ERA después de los argumentos
+        for (int i = 0; i < values.size(); i++) {
+            generator.emitParam(values.get(i), i + 1);                   // PARAM argumento _ k
+        }
+        generator.emitGosub(name, function.startQuad());                 // GOSUB al inicio de la función
+
         if (!inExpression) {
-            generator.note("aquí irá GOSUB " + name);
-        } else if (voidValue) {
+            return;                                                      // como estatuto, el valor se descarta
+        }
+        if (voidValue) {
             generator.pushOperand(Operand.ERROR);
         } else {
-            Operand result = generator.newTemp(function.returnType());
-            generator.note("aquí irá GOSUB " + name + "; " + result + " recibirá su valor de retorno");
-            generator.pushOperand(result);
+            // llamada en expresión: el valor de regreso se copia a un temporal propio
+            generator.emitCallResult(generator.returnSlot(name, function.returnType(), function.returnAddress()));
         }
+    }
+
+    /** Tamaño usado en el segmento hasta ahora, por tipo (para el directorio de funciones) */
+    private MemorySize sizeOf(Segment segment) {
+        VirtualMemory memory = generator.memory();
+        return new MemorySize(memory.count(segment, Type.INT), memory.count(segment, Type.FLOAT),
+                memory.count(segment, Type.BOOL));
     }
 
     /** La condición de if/while debe ser BOOL; regresa el operando de la condición */
@@ -581,7 +614,8 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
         boolean returned = false;
         boolean reported = false;
         for (BabyDuckParser.StatementContext statement : statements) {
-            // En main, return ya es error; no se reporta además código inalcanzable
+            // Regla de código inalcanzable (sin número de punto): un estatuto después de uno que
+            // siempre regresa. En main, return ya es error; no se reporta además código inalcanzable
             if (returned && !reported && currentFunction != null) {
                 error(statement.getStart(), "código inalcanzable: hay un return antes de este estatuto");
                 reported = true;

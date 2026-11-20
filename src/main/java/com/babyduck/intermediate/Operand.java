@@ -61,6 +61,12 @@ public final class Operand {
         return address;
     }
 
+    /** false para los operandos que no son memoria: destino de salto, función y número de parámetro */
+    public boolean hasAddress() {
+        return kind != OperandKind.QUAD_INDEX && kind != OperandKind.FUNCTION
+                && kind != OperandKind.PARAM_INDEX;
+    }
+
     public boolean isError() {
         return kind == OperandKind.ERROR;
     }

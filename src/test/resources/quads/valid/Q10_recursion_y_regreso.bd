@@ -1,0 +1,104 @@
+// Q10: recursión con return anticipado, f(5) + f(3), llamada anidada y función con valor como estatuto
+program _Q10_;
+var _A_ : int;
+int _Fact_(_N_ : int) [ {
+    if (_N_ < 2) {
+        return 1;
+    };
+    return _N_ * _Fact_(_N_ - 1);
+} ];
+int _Suma1_(_X_ : int) [ {
+    return _X_ + 1;
+} ];
+main {
+    _A_ = _Fact_(5) + _Fact_(3);
+    _A_ = _Fact_(_Suma1_(1));
+    _Suma1_(_A_);
+}
+end
+
+// Regreso de _Fact_ en 1001 y de _Suma1_ en 1002 (globales int, después de _A_).
+// La llamada recursiva (7) salta al inicio de _Fact_ (1), que ya se conocía antes del cuerpo.
+// _Fact_(5) + _Fact_(3): cada GOSUB copia el regreso a su propio temporal (t6 y t7).
+// _Fact_(_Suma1_(1)): la llamada a _Suma1_ termina completa (25-28) antes del ERA de _Fact_ (29).
+// _Suma1_(_A_) como estatuto: después del GOSUB (36) no hay copia del resultado.
+
+// cuadruplos:
+// 0 GOTO _ _ 15
+// 1 < _N_ 2 t1
+// 2 GOTOF t1 _ 4
+// 3 RETURN 1 _ _Fact_
+// 4 - _N_ 1 t2
+// 5 ERA _Fact_ _ _
+// 6 PARAM t2 _ 1
+// 7 GOSUB _Fact_ _ 1
+// 8 = _Fact_ _ t3
+// 9 * _N_ t3 t4
+// 10 RETURN t4 _ _Fact_
+// 11 ENDFUNC _ _ _
+// 12 + _X_ 1 t5
+// 13 RETURN t5 _ _Suma1_
+// 14 ENDFUNC _ _ _
+// 15 ERA _Fact_ _ _
+// 16 PARAM 5 _ 1
+// 17 GOSUB _Fact_ _ 1
+// 18 = _Fact_ _ t6
+// 19 ERA _Fact_ _ _
+// 20 PARAM 3 _ 1
+// 21 GOSUB _Fact_ _ 1
+// 22 = _Fact_ _ t7
+// 23 + t6 t7 t8
+// 24 = t8 _ _A_
+// 25 ERA _Suma1_ _ _
+// 26 PARAM 1 _ 1
+// 27 GOSUB _Suma1_ _ 12
+// 28 = _Suma1_ _ t9
+// 29 ERA _Fact_ _ _
+// 30 PARAM t9 _ 1
+// 31 GOSUB _Fact_ _ 1
+// 32 = _Fact_ _ t10
+// 33 = t10 _ _A_
+// 34 ERA _Suma1_ _ _
+// 35 PARAM _A_ _ 1
+// 36 GOSUB _Suma1_ _ 12
+// 37 END _ _ _
+
+// direcciones:
+// 0 15 _ _ 15
+// 1 6 3000 8000 7000
+// 2 16 7000 _ 4
+// 3 20 8001 _ 1001
+// 4 2 3000 8001 5000
+// 5 17 _Fact_ _ _
+// 6 18 5000 _ 1
+// 7 19 _Fact_ _ 1
+// 8 9 1001 _ 5001
+// 9 3 3000 5001 5002
+// 10 20 5002 _ 1001
+// 11 21 _ _ _
+// 12 1 3000 8001 5000
+// 13 20 5000 _ 1002
+// 14 21 _ _ _
+// 15 17 _Fact_ _ _
+// 16 18 8002 _ 1
+// 17 19 _Fact_ _ 1
+// 18 9 1001 _ 5000
+// 19 17 _Fact_ _ _
+// 20 18 8003 _ 1
+// 21 19 _Fact_ _ 1
+// 22 9 1001 _ 5001
+// 23 1 5000 5001 5002
+// 24 9 5002 _ 1000
+// 25 17 _Suma1_ _ _
+// 26 18 8001 _ 1
+// 27 19 _Suma1_ _ 12
+// 28 9 1002 _ 5003
+// 29 17 _Fact_ _ _
+// 30 18 5003 _ 1
+// 31 19 _Fact_ _ 1
+// 32 9 1001 _ 5004
+// 33 9 5004 _ 1000
+// 34 17 _Suma1_ _ _
+// 35 18 1000 _ 1
+// 36 19 _Suma1_ _ 12
+// 37 14 _ _ _

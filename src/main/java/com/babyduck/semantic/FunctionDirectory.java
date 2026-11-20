@@ -21,6 +21,22 @@ public final class FunctionDirectory {
     private String programName;
     private final VariableTable globals = new VariableTable();
     private final Map<String, FunctionInfo> functions = new LinkedHashMap<>();
+    private MemorySize globalSize = MemorySize.EMPTY;     // globales + direcciones de regreso
+    private MemorySize mainTempSize = MemorySize.EMPTY;   // temporales de main
+
+    /** Tamaño del segmento global y de los temporales de main, al terminar de compilar */
+    public void setSizes(MemorySize globals, MemorySize mainTemps) {
+        this.globalSize = globals;
+        this.mainTempSize = mainTemps;
+    }
+
+    public MemorySize globalSize() {
+        return globalSize;
+    }
+
+    public MemorySize mainTempSize() {
+        return mainTempSize;
+    }
 
     /** Registra el nombre del programa; ocupa su nombre como cualquier otro*/
     public void setProgramName(String name) {
@@ -88,7 +104,9 @@ public final class FunctionDirectory {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder("Programa: ").append(programName)
-                .append("\nGlobales: ").append(globals);
+                .append("\nGlobales: ").append(globals)
+                .append("\nSegmento global: ").append(globalSize)
+                .append("\nTemporales de main: ").append(mainTempSize);
         for (FunctionInfo f : functions.values()) {
             sb.append('\n').append(f);
         }

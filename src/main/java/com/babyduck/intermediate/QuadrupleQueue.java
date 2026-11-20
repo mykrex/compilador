@@ -11,28 +11,25 @@ import java.util.List;
  * pero se guardan en un ArrayList y no en una cola pura, para tener acceso por índice
  * a cuádruplos ya generados (por ejemplo, para rellenar el destino de un salto).
  * Se numera desde 0: el número de un cuádruplo es su posición en la lista
- *
- * Además guarda notas: textos que el estilo FULL muestra entre los cuádruplos
  */
 public final class QuadrupleQueue {
 
     /** Formas de imprimir la fila */
     public enum Style {
-        /** Solo nombres, una línea por cuádruplo, sin encabezado ni notas. Lo usan las pruebas */
+        /** Solo nombres, una línea por cuádruplo, sin encabezado. Lo usan las pruebas */
         SYMBOLIC,
         /**
-         * Código del operador y direcciones virtuales, una línea por cuádruplo, sin encabezado
-         * ni notas: es lo que verá la máquina virtual. Lo usan las pruebas de direcciones
+         * Código del operador y direcciones virtuales, una línea por cuádruplo, sin encabezado:
+         * es lo que verá la máquina virtual. Lo usan las pruebas de direcciones
          */
         ADDRESS,
-        /** Tabla con encabezado y notas para la consola; cada operando como dirección(nombre) */
+        /** Tabla con encabezado para la consola; cada operando como dirección(nombre) */
         FULL
     }
 
     private static final String EMPTY = "_";
 
     private final List<Quadruple> quadruples = new ArrayList<>();
-    private final List<Note> notes = new ArrayList<>();
 
     /** Agrega un cuádruplo al final y regresa su número */
     int add(Quadruple quadruple) {
@@ -47,11 +44,6 @@ public final class QuadrupleQueue {
     void fill(int index, Operand target) {
         Quadruple q = quadruples.get(index);
         quadruples.set(index, new Quadruple(q.op(), q.left(), q.right(), target));
-    }
-
-    /** Agrega una nota antes del próximo cuádruplo que se genere */
-    void addNote(String text) {
-        notes.add(new Note(quadruples.size(), text));
     }
 
     /** Número que tendrá el próximo cuádruplo */
@@ -70,11 +62,6 @@ public final class QuadrupleQueue {
     /** Todos los cuádruplos, en orden (solo lectura) */
     public List<Quadruple> quadruples() {
         return Collections.unmodifiableList(quadruples);
-    }
-
-    /** Todas las notas, en orden (solo lectura) */
-    public List<Note> notes() {
-        return Collections.unmodifiableList(notes);
     }
 
     /** Único método que convierte la fila en texto */
@@ -104,16 +91,8 @@ public final class QuadrupleQueue {
             }
         }
         appendRow(sb, header, width);
-        int nextNote = 0;
-        for (int i = 0; i <= rows.size(); i++) {
-            while (nextNote < notes.size() && notes.get(nextNote).position() == i) {
-                sb.append(" ".repeat(width[0] + 2)).append("· ")
-                        .append(notes.get(nextNote).text()).append('\n');
-                nextNote++;
-            }
-            if (i < rows.size()) {
-                appendRow(sb, rows.get(i), width);
-            }
+        for (String[] row : rows) {
+            appendRow(sb, row, width);
         }
         return sb.toString();
     }
@@ -129,13 +108,14 @@ public final class QuadrupleQueue {
 
     /**
      * Texto de un operando según el estilo: nombre, dirección, o dirección(nombre).
-     * El destino de un salto es un número de cuádruplo y se imprime igual en los tres estilos
+     * Los operandos que no son direcciones (destino de un salto, función, número de
+     * parámetro) se imprimen igual en los tres estilos
      */
     private static String show(Operand operand, Style style) {
         if (operand == null) {
             return EMPTY;
         }
-        if (operand.kind() == OperandKind.QUAD_INDEX) {
+        if (!operand.hasAddress()) {
             return operand.name();
         }
         return switch (style) {
