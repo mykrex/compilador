@@ -1,29 +1,27 @@
-# 3. Análisis Sintáctico
+# Análisis Sintáctico
 
 ## Índice
 
-0. [Overview](overview.md)
-1. [Herramientas](herramientas.md)
-2. [Análisis Léxico](lexico.md)
-3. [Análisis Sintáctico](sintaxis.md)
-4. [Análisis Semántico](semantica.md)
-5. Código Intermedio _(pendiente)_
-6. Memoria Virtual _(pendiente)_
-7. Máquina Virtual _(pendiente)_
-8. [Testing](08_testing.md)
-9. [Herramientas de IA](herramientas_ia.md)
-10. [Guía de uso](guia_de_uso.md)
+1. [Overview](01_overview.md)
+2. [Herramientas](02_herramientas.md)
+3. [Análisis léxico](03_lexico.md)
+4. **Análisis sintáctico** (este capítulo)
+5. [Análisis semántico](05_semantica.md)
+6. [Código intermedio](06_codigo_intermedio.md)
+7. [Testing](07_testing.md)
+8. [Herramientas de IA](08_herramientas_ia.md)
+9. [Guía de uso](09_guia_de_uso.md)
 
 ---
 
-## 3.1 Formato en que se dieron de alta las reglas
+## Formato en que se dieron de alta las reglas
 
 Las reglas de construcción de BabyDuck se dieron de alta en el archivo **`BabyDuck.g4`** (`src/main/antlr4/com/babyduck/`), en la **notación EBNF de ANTLR4**. Es una gramática combinada: el mismo archivo contiene
 
 - las **reglas del parser** (nombres en minúscula), que corresponden a la CFG, y
-- las **reglas del lexer** (nombres en MAYÚSCULA), que corresponden a las expresiones regulares ([§2.3](02_lexico.md#23-implementación-en-antlr4)).
+- las **reglas del lexer** (nombres en MAYÚSCULA), que corresponden a las expresiones regulares ([Implementación en ANTLR4](03_lexico.md#implementación-en-antlr4)).
 
-La CFG se diseñó originalmente en **BNF** ([§3.2](#32-gramática-original-bnf)) y se transcribió a EBNF sustituyendo las reglas recursivas con ε por los operadores:
+La CFG se diseñó originalmente en **BNF** ([Gramática original](#gramática-original-bnf)) y se transcribió a EBNF sustituyendo las reglas recursivas con ε por los operadores:
 
 | Operador EBNF | Significado          | Equivale en BNF a                |
 | ------------- | -------------------- | -------------------------------- |
@@ -46,7 +44,7 @@ Ambas notaciones describen el mismo lenguaje. Con EBNF el árbol de parseo es m�
 
 **Convención de nombres:** los nombres de reglas y tokens están en inglés, igual que las palabras reservadas de BabyDuck, siguiendo la convención de ANTLR (`lowerCamelCase` para reglas y `UPPER_SNAKE_CASE` para tokens).
 
-## 3.2 Gramática original (BNF)
+## Gramática original (BNF)
 
 Gramática entregada en la actividad anterior, basada en los diagramas de sintaxis de BabyDuck.
 
@@ -104,7 +102,7 @@ Gramática entregada en la actividad anterior, basada en los diagramas de sintax
 <CTE>          → cte_int | cte_float
 ```
 
-## 3.3 Modificaciones a la especificación
+## Modificaciones a la especificación
 
 Los diagramas de BabyDuck son una propuesta que puede ajustarse con justificación. Se hicieron las siguientes modificaciones:
 
@@ -185,7 +183,7 @@ La sintaxis acepta ambas formas; en el **análisis semántico** se validará que
 
 Se agrega `COMMENT : '//' ~[\r\n]* -> skip ;` al lexer. No modifica ninguna regla gramatical y permite documentar los programas de prueba.
 
-## 3.4 Gramática final (BNF)
+## Gramática final (BNF)
 
 Gramática con las modificaciones aplicadas (marcadas con `M#`).
 
@@ -245,7 +243,7 @@ Gramática con las modificaciones aplicadas (marcadas con `M#`).
 <CTE>          → cte_int | cte_float
 ```
 
-## 3.5 Implementación en ANTLR4 (EBNF)
+## Implementación en ANTLR4 (EBNF)
 
 Reglas del parser en `BabyDuck.g4`. La primera regla, `program`, es el símbolo inicial; el `EOF` final obliga a consumir el archivo completo.
 
@@ -299,7 +297,7 @@ cte        : CTE_INT | CTE_FLOAT ;
 funcCall   : ID LPAREN (expression (COMMA expression)*)? RPAREN ;   // M1
 ```
 
-## 3.6 Equivalencia BNF → ANTLR
+## Equivalencia BNF → ANTLR
 
 | Gramática BNF                                                      | Regla en `BabyDuck.g4`              |
 | ------------------------------------------------------------------ | ----------------------------------- |
@@ -325,7 +323,7 @@ funcCall   : ID LPAREN (expression (COMMA expression)*)? RPAREN ;   // M1
 | `<valor>`                                                          | `value`                             |
 | `<CTE>`                                                            | `cte`                               |
 
-## 3.7 Observaciones sobre la gramática
+## Observaciones sobre la gramática
 
 - **Precedencia de operadores:** se obtiene de la jerarquía de reglas `expression → exp → term → factor`. Los operadores relacionales tienen la menor precedencia, después `+ -` y al final `* /`. Los paréntesis permiten alterarla.
 - **Un solo operador relacional por expresión:** `expression : exp (relOp exp)?` hace que `_A_ < _B_ < _C_` sea inválido.
@@ -333,7 +331,7 @@ funcCall   : ID LPAREN (expression (COMMA expression)*)? RPAREN ;   // M1
 - **Orden de las secciones del programa:** `var` → funciones → `main`. Declarar variables globales después de las funciones es un error de sintaxis.
 - **Validaciones que no son sintácticas:** que una variable esté declarada, la compatibilidad de tipos y el uso correcto de `return` se verificarán en el análisis semántico.
 
-## 3.8 Manejo de errores sintácticos
+## Manejo de errores sintácticos
 
 ANTLR reporta los errores a los _error listeners_ del lexer y del parser. Por defecto solo los imprime y continúa; en este proyecto se reemplazan por `ErrorCollector`, que guarda cada error con su fase, línea y columna:
 
@@ -365,5 +363,5 @@ Después de un error, ANTLR intenta recuperarse y seguir analizando, por lo que 
 
 ## Navegación
 
-- Anterior: [← Análisis Léxico](02_lexico.md)
-- Siguiente: [Testing →](08_testing.md)
+- Anterior: [← Análisis léxico](03_lexico.md)
+- Siguiente: [Análisis semántico →](05_semantica.md)

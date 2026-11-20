@@ -1,22 +1,20 @@
-# 2. Análisis Léxico
+# Análisis Léxico
 
 ## Índice
 
-0. [Overview](overview.md)
-1. [Herramientas](herramientas.md)
-2. [Análisis Léxico](lexico.md)
-3. [Análisis Sintáctico](sintaxis.md)
-4. [Análisis Semántico](semantica.md)
-5. Código Intermedio _(pendiente)_
-6. Memoria Virtual _(pendiente)_
-7. Máquina Virtual _(pendiente)_
-8. [Testing](08_testing.md)
-9. [Herramientas de IA](herramientas_ia.md)
-10. [Guía de uso](guia_de_uso.md)
+1. [Overview](01_overview.md)
+2. [Herramientas](02_herramientas.md)
+3. **Análisis léxico** (este capítulo)
+4. [Análisis sintáctico](04_sintaxis.md)
+5. [Análisis semántico](05_semantica.md)
+6. [Código intermedio](06_codigo_intermedio.md)
+7. [Testing](07_testing.md)
+8. [Herramientas de IA](08_herramientas_ia.md)
+9. [Guía de uso](09_guia_de_uso.md)
 
 ---
 
-## 2.1 Expresiones regulares
+## Expresiones regulares
 
 | Token        | Expresión regular      | Ejemplos válidos                  |
 | ------------ | ---------------------- | --------------------------------- |
@@ -35,7 +33,7 @@
 - **Letreros:** van entre comillas dobles, no pueden contener saltos de línea y admiten secuencias de escape con `\` (por ejemplo `\"`). Solo se usan dentro de `print`.
 - **Comentarios** (extensión): de una línea, con `//`. Se descartan junto con espacios, tabuladores y saltos de línea.
 
-## 2.2 Tokens
+## Tokens
 
 ### Palabras reservadas
 
@@ -59,7 +57,7 @@
 | `MULT`   | `*`    | Multiplicación                                                                          |
 | `DIV`    | `/`    | División                                                                                |
 | `ASSIGN` | `=`    | Asignación                                                                              |
-| `EQ`     | `==`   | Igual a _(extensión, ver [§3.3](03_sintaxis.md#33-modificaciones-a-la-especificación))_ |
+| `EQ`     | `==`   | Igual a _(extensión, ver [Modificaciones a la especificación](04_sintaxis.md#modificaciones-a-la-especificación))_ |
 | `NEQ`    | `!=`   | Diferente de                                                                            |
 | `GT`     | `>`    | Mayor que                                                                               |
 | `LT`     | `<`    | Menor que                                                                               |
@@ -90,7 +88,7 @@
 | `WS`      | Espacios, tabuladores y saltos de línea |
 | `COMMENT` | Comentarios de una línea `// ...`       |
 
-## 2.3 Implementación en ANTLR4
+## Implementación en ANTLR4
 
 Las reglas léxicas están en la segunda mitad de `src/main/antlr4/com/babyduck/BabyDuck.g4`. En ANTLR, los nombres de las reglas léxicas **deben empezar con mayúscula**.
 
@@ -162,5 +160,5 @@ Cuando ningún patrón coincide, el lexer reporta `token recognition error at: '
 
 ## Navegación
 
-- Anterior: [← Herramientas de generación](01_herramientas.md)
-- Siguiente: [Análisis Sintáctico →](03_sintaxis.md)
+- Anterior: [← Herramientas](02_herramientas.md)
+- Siguiente: [Análisis sintáctico →](04_sintaxis.md)

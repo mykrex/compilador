@@ -2,19 +2,19 @@
 
 ## Índice
 
-1. [Overview](overview.md)
-2. [Herramientas](herramientas.md)
-3. [Análisis léxico](lexico.md)
-4. [Análisis sintáctico](sintaxis.md)
-5. [Análisis semántico](semantica.md)
+1. [Overview](01_overview.md)
+2. [Herramientas](02_herramientas.md)
+3. [Análisis léxico](03_lexico.md)
+4. [Análisis sintáctico](04_sintaxis.md)
+5. [Análisis semántico](05_semantica.md)
 6. **Código intermedio** (este capítulo)
-7. [Testing](testing.md)
-8. [Herramientas de IA](herramientas_ia.md)
-9. [Guía de uso](guia_de_uso.md)
+7. [Testing](07_testing.md)
+8. [Herramientas de IA](08_herramientas_ia.md)
+9. [Guía de uso](09_guia_de_uso.md)
 
 ---
 
-## 1. Qué hace
+## Qué hace
 
 Genera **cuádruplos** para las expresiones aritméticas y relacionales y para los estatutos
 lineales (asignación, `print`, `read`), más `END` al final de `main`. La generación ocurre en la
@@ -33,7 +33,7 @@ La gramática no cambió: los puntos viven en los métodos del Visitor, no en ac
 | `Outcome`, `Note` | `intermediate` | Resultado de una operación (para reportar errores); nota de código pendiente |
 | `SemanticAnalyzer` | `babyduck` | Puntos neurálgicos: valida, genera y reporta |
 
-## 2. Cuádruplos
+## Cuádruplos
 
 `(operador, izquierdo, derecho, resultado)`; un campo vacío se imprime como `_`. El operador es
 un enum y los operandos son objetos; el texto solo aparece al imprimir.
@@ -51,7 +51,7 @@ un enum y los operandos son objetos; el texto solo aparece al imprimir.
 - **Operandos simbólicos** (`_X_`, `t1`, `-2`, `"hola"`): guardan clase, nombre, tipo y, si son constantes, su valor convertido. Solo se crean con `variable`, `constant`, `string` y `newTemp` (constructor no público), así que en la entrega de memoria solo esos métodos asignarán la dirección.
 - **Temporales:** contador simple `t1, t2…`, sin reutilizar.
 
-## 3. Estructuras
+## Estructuras
 
 | Estructura | Implementación | Por qué |
 |---|---|---|
@@ -73,7 +73,7 @@ error no genera mensajes ni cuádruplos (sin errores en cadena). El generador de
 `Outcome`; `SemanticAnalyzer` arma el mensaje. Un error interno de las pilas lanza
 `IllegalStateException`.
 
-## 4. Expresiones
+## Expresiones
 
 Algoritmo de clase: cada operando entra a las pilas y, **después de cada operando, se revisa el
 tope** de la pila de operadores (`* /` tras un factor, `+ -` tras un término, relacional tras el
@@ -90,7 +90,7 @@ _X_ = _A_ * (_B_ + _C_);        _X_ = _A_ - -2;
 2  =  t2   _    _X_
 ```
 
-## 5. Estatutos lineales
+## Estatutos lineales
 
 - **Asignación:** se valida el destino, que no entra a las pilas (se aparta del algoritmo de clase porque no es operando y `=` no se encadena); después se saca el valor, se revisa con el cubo y se genera `=`. `float ← int` no lleva cuádruplo de conversión.
 - **`print`:** un `PRINT` por elemento, en orden, y un `PRINTLN` al final; sin espacio automático.
@@ -100,7 +100,7 @@ _X_ = _A_ * (_B_ + _C_);        _X_ = _A_ - -2;
 **Lo que aún no genera código** (saltos, llamadas, `return`, funciones): se genera lo lineal que
 contienen y una **nota** marca dónde irá lo demás, por ejemplo `· if (línea 5): aquí irá GotoF t1`.
 
-## 6. Puntos neurálgicos
+## Puntos neurálgicos
 
 Diagramas en [`diagramas/`](diagramas/) (un `.drawio` con todas las páginas, PNG y
 [pseudocódigo](diagramas/pseudocodigo_puntos.md)). Cada número conserva su significado; una letra
@@ -118,7 +118,7 @@ indica que un punto de la entrega 2 ahora ocurre en dos posiciones; los nuevos v
 | 22, 23 | `<Print>` | `PRINT` por elemento / `PRINTLN` |
 | 24 | `<Programa>` | `END` |
 
-## 7. Ejemplo de salida
+## Ejemplo de salida
 
 ```
 === Cuádruplos ===
@@ -134,9 +134,9 @@ indica que un punto de la entrega 2 ahora ocurre en dos posiciones; los nuevos v
 ```
 
 La fila esperada de cada programa de prueba (Q01–Q06) está dentro de su archivo en
-`src/test/resources/quads/valid/` (ver [Testing](testing.md)).
+`src/test/resources/quads/valid/` (ver [Testing](07_testing.md)).
 
-## 8. Cambios respecto a la entrega anterior
+## Cambios respecto a la entrega anterior
 
 - Tipo interno `string`, solo para letreros (operandos de `PRINT`); fuera del cubo y de las pilas.
 - Las pilas son la única fuente de tipos: el Visitor es `BabyDuckBaseVisitor<Void>` y se conserva por las acciones a mitad de regla.
@@ -148,5 +148,5 @@ La fila esperada de cada programa de prueba (Q01–Q06) está dentro de su archi
 
 ## Navegación
 
-- Anterior: [← Análisis semántico](semantica.md)
-- Siguiente: [Testing →](testing.md)
+- Anterior: [← Análisis semántico](05_semantica.md)
+- Siguiente: [Testing →](07_testing.md)

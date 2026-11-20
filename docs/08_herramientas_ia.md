@@ -1,24 +1,22 @@
-# 9. Herramientas de IA
+# Herramientas de IA
 
 ## Índice
 
-0. [Overview](overview.md)
-1. [Herramientas](herramientas.md)
-2. [Análisis Léxico](lexico.md)
-3. [Análisis Sintáctico](sintaxis.md)
-4. [Análisis Semántico](semantica.md)
-5. [Código Intermedio](codigo_intermedio.md)
-6. Memoria Virtual _(pendiente)_
-7. Máquina Virtual _(pendiente)_
-8. [Testing](08_testing.md)
-9. [Herramientas de IA](herramientas_ia.md)
-10. [Guía de uso](guia_de_uso.md)
+1. [Overview](01_overview.md)
+2. [Herramientas](02_herramientas.md)
+3. [Análisis léxico](03_lexico.md)
+4. [Análisis sintáctico](04_sintaxis.md)
+5. [Análisis semántico](05_semantica.md)
+6. [Código intermedio](06_codigo_intermedio.md)
+7. [Testing](07_testing.md)
+8. **Herramientas de IA** (este capítulo)
+9. [Guía de uso](09_guia_de_uso.md)
 
 ---
 
 > **Nota para la autora:** este registro es un borrador. Revísalo y ajústalo para que describa con precisión cómo usaste la herramienta.
 
-## 9.1 Entrega 1: Scanner, Parser y Test-Plan
+## Entrega 1: Scanner, Parser y Test-Plan
 
 **Herramienta:** Claude (Anthropic)
 
@@ -32,7 +30,7 @@
 | Test-Plan                   | Propuesta de los casos léxicos y sintácticos                                                      | Selección de los casos y ejecución                                             |
 | Documentación               | Redacción del borrador de esta documentación                                                      | Revisión y edición final                                                       |
 
-## 9.2 Entrega 2: Semántica de variables (cubo semántico, directorio de funciones y tablas de variables)
+## Entrega 2: Semántica de variables (cubo semántico, directorio de funciones y tablas de variables)
 
 **Herramienta:** Claude (Anthropic), modelo Opus 5.5
 
@@ -48,7 +46,7 @@ La forma de trabajo fue por bloques que se podían probar antes de seguir. Para 
 | Validaciones de uso              | Reglas de llamadas, `return`, caminos sin `return` y código inalcanzable lenguajes                                                                                                                                      | Decisión de las reglas (ej. revisar todos los caminos)                                             |
 | Pruebas                          | Propuesta de los casos `.bd` válidos e inválidos y de la clase `SemanticTest`                                                                                                                                           | Ejecución de las pruebas                                                                           |
 
-## 9.3 Entrega 3: Código de expresiones y estatutos (pilas, fila de cuádruplos y traducción)
+## Entrega 3: Código de expresiones y estatutos (pilas, fila de cuádruplos y traducción)
 
 **Herramienta:** Claude (Anthropic), modelo Opus 5.5
 
@@ -72,5 +70,5 @@ La forma de trabajo fue por bloques que se podían probar antes de seguir. Para 
 
 ## Navegación
 
-- Anterior: [← Testing](08_testing.md)
-- Siguiente: [Guía de uso →](10_guia_de_uso.md)
+- Anterior: [← Testing](07_testing.md)
+- Siguiente: [Guía de uso →](09_guia_de_uso.md)

@@ -1,22 +1,20 @@
-# 1. Herramientas de Generación de Scanners y Parsers
+# Herramientas de Generación de Scanners y Parsers
 
 ## Índice
 
-0. [Overview](overview.md)
-1. [Herramientas](herramientas.md)
-2. [Análisis Léxico](lexico.md)
-3. [Análisis Sintáctico](sintaxis.md)
-4. [Análisis Semántico](semantica.md)
-5. Código Intermedio _(pendiente)_
-6. Memoria Virtual _(pendiente)_
-7. Máquina Virtual _(pendiente)_
-8. [Testing](08_testing.md)
-9. [Herramientas de IA](herramientas_ia.md)
-10. [Guía de uso](guia_de_uso.md)
+1. [Overview](01_overview.md)
+2. **Herramientas** (este capítulo)
+3. [Análisis léxico](03_lexico.md)
+4. [Análisis sintáctico](04_sintaxis.md)
+5. [Análisis semántico](05_semantica.md)
+6. [Código intermedio](06_codigo_intermedio.md)
+7. [Testing](07_testing.md)
+8. [Herramientas de IA](08_herramientas_ia.md)
+9. [Guía de uso](09_guia_de_uso.md)
 
 ---
 
-## 1.1 Criterios de selección
+## Criterios de selección
 
 Se buscó la herramienta que:
 
@@ -25,7 +23,7 @@ Se buscó la herramienta que:
 3. Se adapte a la gramática ya diseñada (escrita en estilo LL, sin recursión izquierda).
 4. Facilite las siguientes etapas: análisis semántico y generación de código intermedio.
 
-## 1.2 Herramientas analizadas
+## Herramientas analizadas
 
 | Herramienta      | ¿Genera Java?                                | Tipo de parser       | Archivos de entrada | Documentación                                                                            |
 | ---------------- | -------------------------------------------- | -------------------- | ------------------- | ---------------------------------------------------------------------------------------- |
@@ -72,7 +70,7 @@ Se buscó la herramienta que:
 | Beaver      | LALR; alternativa más moderna a CUP, con poca comunidad                    |
 | CongoCC     | Sucesor moderno de JavaCC                                                  |
 
-## 1.3 Top-Down (LL) vs Bottom-Up (LR)
+## Top-Down (LL) vs Bottom-Up (LR)
 
 |                      | LL (_top-down_): ANTLR, JavaCC                      | LR (_bottom-up_): Bison, CUP                         |
 | -------------------- | --------------------------------------------------- | ---------------------------------------------------- |
@@ -81,7 +79,7 @@ Se buscó la herramienta que:
 | Depuración           | Sencilla, regla por regla                           | Requiere interpretar conflictos de la tabla          |
 | Acciones semánticas  | En cualquier punto de la regla                      | Solo al reducir; requiere no terminales "marcadores" |
 
-## 1.4 Herramienta seleccionada: ANTLR4
+## Herramienta seleccionada: ANTLR4
 
 Se eligió **ANTLR 4.13.2** por las siguientes razones:
 
@@ -95,5 +93,5 @@ Se eligió **ANTLR 4.13.2** por las siguientes razones:
 
 ## Navegación
 
-- Anterior: [← Overview](00_overview.md)
-- Siguiente: [Análisis Léxico →](02_lexico.md)
+- Anterior: [← Overview](01_overview.md)
+- Siguiente: [Análisis léxico →](03_lexico.md)

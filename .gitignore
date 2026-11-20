@@ -40,6 +40,3 @@ build/
 
 # Ignorar la carpeta de respaldos/versiones
 *docs/diagramas/v1/
-
-# Ignorar
-*BabyDuck_contexto_claude/

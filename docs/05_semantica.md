@@ -2,25 +2,25 @@
 
 ## Índice
 
-1. [Overview](overview.md)
-2. [Herramientas](herramientas.md)
-3. [Análisis léxico](lexico.md)
-4. [Análisis sintáctico](sintaxis.md)
+1. [Overview](01_overview.md)
+2. [Herramientas](02_herramientas.md)
+3. [Análisis léxico](03_lexico.md)
+4. [Análisis sintáctico](04_sintaxis.md)
 5. **Análisis semántico** (este capítulo)
-6. [Código intermedio](codigo_intermedio.md)
-7. [Testing](testing.md)
-8. [Herramientas de IA](herramientas_ia.md)
-9. [Guía de uso](guia_de_uso.md)
+6. [Código intermedio](06_codigo_intermedio.md)
+7. [Testing](07_testing.md)
+8. [Herramientas de IA](08_herramientas_ia.md)
+9. [Guía de uso](09_guia_de_uso.md)
 
 ---
 
-## 1. Qué hace
+## Qué hace
 
 Revisa que un programa correcto en léxico y sintaxis tenga sentido: cada nombre se declara una
 vez y se usa según lo que es, y los tipos de cada operación, asignación, llamada, condición y
 `return` son compatibles. Corre solo si no hubo errores léxicos ni sintácticos (un árbol reparado
 por ANTLR daría errores falsos). Desde la entrega 3, los mismos puntos neurálgicos generan los
-cuádruplos ([Código intermedio](codigo_intermedio.md)).
+cuádruplos ([Código intermedio](06_codigo_intermedio.md)).
 
 Criterio de diseño: la regla más simple de implementar y explicar, **siempre que no deje pasar
 errores detectables ni obligue al programador a rodeos**.
@@ -37,7 +37,7 @@ errores detectables ni obligue al programador a rodeos**.
 El paquete `semantic` no depende de ANTLR; `SemanticAnalyzer` vive en `com.babyduck` porque usa
 las clases generadas.
 
-## 2. Tipos
+## Tipos
 
 | Tipo | ¿Declarable? | Uso |
 |---|---|---|
@@ -50,7 +50,7 @@ las clases generadas.
 `bool` propio en lugar de enteros 0/1: así `if (_X_)` y `(_A_ < _B_) + 1` son errores y la regla
 de las condiciones es una sola.
 
-## 3. Cubo semántico
+## Cubo semántico
 
 | Izquierdo | Derecho | `+ - *` | `/` | `> < == !=` | `=` (destino ← valor) |
 |---|---|---|---|---|---|
@@ -74,7 +74,7 @@ cube.unaryResult(op, operand)   // signo
 cube.canAssign(target, value)   // asignación, argumentos y return
 ```
 
-## 4. Tabla de variables y directorio de funciones
+## Tabla de variables y directorio de funciones
 
 - **`VariableTable`:** `LinkedHashMap` por nombre: búsqueda O(1) y conserva el orden de declaración (salida legible y, en memoria, direcciones en orden). `add` regresa `false` si el nombre ya existe (sin excepciones: quien llama conoce la línea y reporta).
 - **`FunctionDirectory`:** nombre del programa, tabla de globales (campo aparte, también la usa `main`) y `LinkedHashMap` de funciones.
@@ -87,14 +87,14 @@ dir.addFunction(f) / getFunction(name) / globals() / lookupVariable(name, actual
 f.addParam(v) / addLocal(v) / params() / paramCount() / locals() / returnType()
 ```
 
-## 5. Alcance y nombres
+## Alcance y nombres
 
 - Dos alcances: global (incluye `main`) y el local de cada función; basta una referencia a la función actual.
 - Sin sombreado: una local o un parámetro no puede llamarse como una global.
 - Un solo espacio de nombres para programa, funciones y globales; funciones distintas sí pueden repetir locales.
 - Una sola pasada: se declara antes de usar. La recursión directa funciona (la función se registra antes de su cuerpo); la mutua no.
 
-## 6. Recorrido y puntos neurálgicos
+## Recorrido y puntos neurálgicos
 
 Visitor (`BabyDuckBaseVisitor<Void>`) en lugar de Listener, porque permite acciones a mitad de una
 regla (las necesitarán los saltos de `if` y `while`). Las expresiones dejan su resultado en las
@@ -107,14 +107,14 @@ pilas del generador de cuádruplos; el cubo se consulta al sacar los operandos.
 | 4 | `funcDecl` (inicio) | Registrar la función antes de su cuerpo; función actual |
 | 5 | `param` | Agregar a la lista y a la tabla |
 | 6, 7 | Fin de función / antes de `main` | Función actual = ninguna |
-| 8–11, 13 | `factor`, `term`/`exp`, `expression`, `assign`, `read` | Validar y generar cuádruplos (ver [Código intermedio](codigo_intermedio.md)) |
+| 8–11, 13 | `factor`, `term`/`exp`, `expression`, `assign`, `read` | Validar y generar cuádruplos (ver [Código intermedio](06_codigo_intermedio.md)) |
 | 12 | `condition`, `cycle` | La condición debe ser `bool` |
 | 14 | Llamada como estatuto | Revisar la llamada; el valor se descarta |
 | 15 | `returnStmt` | Reglas de `return` |
 | 16 | `funcDecl` (antes del cuerpo) | Una función con valor regresa en todos los caminos |
 | 17 | `body`, `[ ]` | Código después de un `return` |
 
-## 7. Validaciones
+## Validaciones
 
 Formato: `[Error semántico] línea 3:4 -> mensaje`.
 
@@ -138,15 +138,15 @@ if (_X_ > 0) { return 1; };                      // error: falta el caso contrar
 if (_X_ > 0) { return 1; } else { return 0; };   // válido
 ```
 
-## 8. Pruebas
+## Pruebas
 
 `SemanticCubeTest`, `VariableTableTest`, `FunctionDirectoryTest` y `SemanticTest` (22 programas
 en `src/test/resources/semantic/`: SEM01 y SEM07 válidos; los demás, un error cada uno, cuyo
-mensaje debe contener su línea `// esperado:`). Detalle en [Testing](testing.md).
+mensaje debe contener su línea `// esperado:`). Detalle en [Testing](07_testing.md).
 
 Fuera del alcance: variables usadas sin valor y división entre cero (máquina virtual).
 
-## 9. Cambios respecto a la entrega anterior (entrega 3)
+## Cambios respecto a la entrega anterior (entrega 3)
 
 - Nuevo tipo interno `string` para letreros.
 - El Visitor ya no devuelve tipos (`<Void>`): las pilas son la única fuente; se conserva por las acciones a mitad de regla.
@@ -158,5 +158,5 @@ Fuera del alcance: variables usadas sin valor y división entre cero (máquina v
 
 ## Navegación
 
-- Anterior: [← Análisis sintáctico](sintaxis.md)
-- Siguiente: [Código intermedio →](codigo_intermedio.md)
+- Anterior: [← Análisis sintáctico](04_sintaxis.md)
+- Siguiente: [Código intermedio →](06_codigo_intermedio.md)

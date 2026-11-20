@@ -1,41 +1,39 @@
 # Compilador BabyDuck
 
-**Autor(a):** [Tu nombre] · **Matrícula:** [Tu matrícula]
-**Materia:** [Nombre de la materia] · **Profesor(a):** [Nombre]
+**Autor(a):** Maria Quetzalli Ramirez Martinez · **Matrícula:** A01753959
+**Materia:** Desarrollo de aplicaciones avanzadas de ciencias computacionales · **Profesor(a):** [Nombre]
 
 ## Índice
 
-0. [Overview](overview.md)
-1. [Herramientas](herramientas.md)
-2. [Análisis Léxico](lexico.md)
-3. [Análisis Sintáctico](sintaxis.md)
-4. [Análisis Semántico](semantica.md)
-5. Código Intermedio _(pendiente)_
-6. Memoria Virtual _(pendiente)_
-7. Máquina Virtual _(pendiente)_
-8. [Testing](08_testing.md)
-9. [Herramientas de IA](herramientas_ia.md)
-10. [Guía de uso](guia_de_uso.md)
+1. **Overview** (este capítulo)
+2. [Herramientas](02_herramientas.md)
+3. [Análisis léxico](03_lexico.md)
+4. [Análisis sintáctico](04_sintaxis.md)
+5. [Análisis semántico](05_semantica.md)
+6. [Código intermedio](06_codigo_intermedio.md)
+7. [Testing](07_testing.md)
+8. [Herramientas de IA](08_herramientas_ia.md)
+9. [Guía de uso](09_guia_de_uso.md)
 
 ---
 
-## 0.1 Descripción
+## Descripción
 
 Este proyecto implementa un compilador para **BabyDuck**, un mini-lenguaje imperativo con variables enteras y flotantes, funciones con parámetros, condiciones, ciclos y entrada/salida.
 
 El compilador se desarrolla en **Java** y usa **ANTLR4** para generar automáticamente el analizador léxico (Scanner) y el analizador sintáctico (Parser) a partir de un archivo de gramática.
 
-## 0.2 Tecnologías
+## Tecnologías
 
 | Elemento                         | Versión / Herramienta           |
 | -------------------------------- | ------------------------------- |
-| Lenguaje de desarrollo           | Java 21 (LTS)                   |
+| Lenguaje de desarrollo           | Java 25 (LTS)                   |
 | Generador de Scanner y Parser    | ANTLR 4.13.2                    |
 | Gestor de proyecto y compilación | Maven                           |
 | Pruebas automáticas              | JUnit 5                         |
 | IDE                              | IntelliJ IDEA + plugin ANTLR v4 |
 
-## 0.3 Flujo del compilador (estado actual)
+## Flujo del compilador (estado actual)
 
 ```mermaid
 flowchart LR
@@ -46,7 +44,7 @@ flowchart LR
     C -.->|errores sintácticos| E
 ```
 
-## 0.4 Estructura del proyecto
+## Estructura del proyecto
 
 ```
 compilador/
@@ -70,7 +68,7 @@ compilador/
 
 Las clases `BabyDuckLexer`, `BabyDuckParser`, `BabyDuckListener` y `BabyDuckVisitor` **no se escriben a mano**: el plugin de Maven las genera desde `BabyDuck.g4` en cada compilación, dentro de `target/generated-sources/antlr4/`.
 
-## 0.5 Compilación y ejecución
+## Compilación y ejecución
 
 ```bash
 mvn compile                 # genera el Scanner/Parser y compila
@@ -86,16 +84,16 @@ Para analizar un programa (en IntelliJ, como _Program arguments_ de `Main`):
 - Sin `--tokens`: indica si el programa es válido e imprime el árbol de parseo, o lista los errores.
 - Con `--tokens`: además imprime la lista de tokens reconocidos.
 
-## 0.6 Avance por entrega
+## Avance por entrega
 
 | Entrega | Contenido                                                         | Estado    |
 | ------- | ----------------------------------------------------------------- | --------- |
-| 1       | Expresiones regulares, tokens y gramática libre de contexto (CFG) | ✅        |
-| 2       | Selección de herramienta, Scanner, Parser y Test-Plan             | ✅        |
+| 1       | Expresiones regulares, tokens y gramática libre de contexto (CFG) | ✓         |
+| 2       | Selección de herramienta, Scanner, Parser y Test-Plan             | ✓         |
 | 3       | Análisis semántico                                                | Pendiente |
 
 ---
 
 ## Navegación
 
-- Siguiente: [Herramientas de generación →](01_herramientas.md)
+- Siguiente: [Herramientas →](02_herramientas.md)

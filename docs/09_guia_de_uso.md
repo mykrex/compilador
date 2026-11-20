@@ -1,28 +1,26 @@
-# 10. Guía de uso de BabyDuck
+# Guía de uso de BabyDuck
 
 ## Índice
 
-0. [Overview](00_overview.md)
-1. [Herramientas](01_herramientas.md)
-2. [Análisis Léxico](02_lexico.md)
-3. [Análisis Sintáctico](03_sintaxis.md)
-4. [Análisis Semántico](04_semantica.md)
-5. [Código Intermedio](codigo_intermedio.md)
-6. [Memoria Virtual](06_memoria_virtual.md)
-7. [Máquina Virtual](07_maquina_virtual.md)
-8. [Testing](08_testing.md)
-9. [Herramientas de IA](herramientas_ia.md)
-10. [Guía de uso](guia_de_uso.md)
+1. [Overview](01_overview.md)
+2. [Herramientas](02_herramientas.md)
+3. [Análisis léxico](03_lexico.md)
+4. [Análisis sintáctico](04_sintaxis.md)
+5. [Análisis semántico](05_semantica.md)
+6. [Código intermedio](06_codigo_intermedio.md)
+7. [Testing](07_testing.md)
+8. [Herramientas de IA](08_herramientas_ia.md)
+9. **Guía de uso** (este capítulo)
 
 ---
 
 > **Estado de la guía.** Cubre lo que el compilador ya hace: revisar el léxico, la sintaxis y la semántica de un programa, y generar el código intermedio (cuádruplos) de sus expresiones y estatutos lineales. Las secciones de ejecución (entrada, salida y errores en tiempo de ejecución) se completarán cuando estén listas la memoria y la máquina virtual; están marcadas como _pendiente_.
 
-Esta guía está pensada para alguien que quiere **escribir programas en BabyDuck**. Explica cómo se escribe un programa, qué reglas sigue el compilador, qué errores puede encontrar y cómo corregirlos. El porqué de cada regla está en los capítulos técnicos (por ejemplo, [Análisis Semántico](04_semantica.md)).
+Esta guía está pensada para alguien que quiere **escribir programas en BabyDuck**. Explica cómo se escribe un programa, qué reglas sigue el compilador, qué errores puede encontrar y cómo corregirlos. El porqué de cada regla está en los capítulos técnicos (por ejemplo, [Análisis Semántico](05_semantica.md)).
 
 ---
 
-## 10.1 ¿Qué es BabyDuck?
+## ¿Qué es BabyDuck?
 
 BabyDuck es un lenguaje de programación pequeño, imperativo y con tipos estáticos, pensado para aprender cómo funciona un compilador. Sus características principales:
 
@@ -34,11 +32,11 @@ BabyDuck es un lenguaje de programación pequeño, imperativo y con tipos estát
 - **Revisión estricta de tipos:** el compilador avisa antes de ejecutar si algo no tiene sentido.
 - **Comentarios** de una línea con `//`.
 
-El compilador está hecho en Java 21 con ANTLR 4.13.2. Los programas se guardan en archivos con extensión `.bd`.
+El compilador está hecho en Java 25 con ANTLR 4.13.2. Los programas se guardan en archivos con extensión `.bd`.
 
 ---
 
-## 10.2 Cómo compilar un programa
+## Cómo compilar un programa
 
 ### Desde IntelliJ
 
@@ -65,7 +63,7 @@ java -cp "target/classes:$(cat cp.txt)" com.babyduck.Main ejemplos/factorial.bd
 
 ### Qué muestra el compilador
 
-**Si el programa es correcto**, imprime `Programa válido`, el árbol sintáctico, el directorio de funciones (las variables y funciones que encontró) y la fila de cuádruplos (el código intermedio, ver [10.14](#1014-ejecución-de-programas)):
+**Si el programa es correcto**, imprime `Programa válido`, el árbol sintáctico, el directorio de funciones (las variables y funciones que encontró) y la fila de cuádruplos (el código intermedio, ver [Ejecución de programas](#ejecución-de-programas)):
 
 ```text
 Programa válido: ejemplos/factorial.bd
@@ -95,7 +93,7 @@ El compilador revisa en tres fases. Si hay errores léxicos o sintácticos, **no
 
 ---
 
-## 10.3 Estructura de un programa
+## Estructura de un programa
 
 Todo programa sigue este orden fijo:
 
@@ -136,7 +134,7 @@ Reglas importantes:
 
 ---
 
-## 10.4 Elementos léxicos
+## Elementos léxicos
 
 ### Identificadores
 
@@ -186,7 +184,7 @@ _X_ = 1;   // esto es un comentario
 
 ---
 
-## 10.5 Tipos de datos y conversiones
+## Tipos de datos y conversiones
 
 | Tipo    | Uso                                          |
 | ------- | -------------------------------------------- |
@@ -220,7 +218,7 @@ Las mismas reglas aplican al pasar argumentos a una función y al regresar un va
 
 ---
 
-## 10.6 Variables
+## Variables
 
 ### Declaración
 
@@ -249,7 +247,7 @@ Después de `var` van una o más líneas de la forma `nombres : tipo;`. Varias v
 
 ---
 
-## 10.7 Expresiones y operadores
+## Expresiones y operadores
 
 ### Precedencia
 
@@ -273,7 +271,7 @@ Los operadores del mismo nivel se evalúan de izquierda a derecha: `10 - 4 - 3` 
 
 ---
 
-## 10.8 Estatutos
+## Estatutos
 
 Todos los estatutos terminan con `;`.
 
@@ -302,7 +300,7 @@ Detalles:
 
 ---
 
-## 10.9 Funciones
+## Funciones
 
 ### Declaración
 
@@ -348,7 +346,7 @@ El compilador no evalúa las condiciones: un `while` siempre se considera un cic
 
 ---
 
-## 10.10 Resumen de restricciones
+## Resumen de restricciones
 
 | Restricción                                             | Alternativa                                                |
 | ------------------------------------------------------- | ---------------------------------------------------------- |
@@ -369,7 +367,7 @@ El compilador no evalúa las condiciones: un `while` siempre se considera un cic
 
 ---
 
-## 10.11 Buenas prácticas y recomendaciones
+## Buenas prácticas y recomendaciones
 
 **Nombres**
 
@@ -397,7 +395,7 @@ El compilador no evalúa las condiciones: un `while` siempre se considera un cic
 
 ---
 
-## 10.12 Errores comunes y cómo corregirlos
+## Errores comunes y cómo corregirlos
 
 Los errores léxicos y sintácticos los genera ANTLR y aparecen en inglés. Los semánticos aparecen en español.
 
@@ -458,7 +456,7 @@ Los errores léxicos y sintácticos los genera ANTLR y aparecen en inglés. Los 
 
 ---
 
-## 10.13 Ejemplos de programas válidos
+## Ejemplos de programas válidos
 
 Todos estos programas pasan las tres fases del compilador.
 
@@ -559,7 +557,7 @@ Este ejemplo muestra:
 
 ---
 
-## 10.14 Ejecución de programas
+## Ejecución de programas
 
 ### Ver el código intermedio
 
@@ -591,7 +589,7 @@ Por ahora se generan los cuádruplos de las expresiones, las asignaciones, `prin
 
 ---
 
-## 10.15 Referencia rápida
+## Referencia rápida
 
 ```
 program _Nombre_;
@@ -636,4 +634,4 @@ end
 
 ## Navegación
 
-- Anterior: [← Herramientas de IA](09_herramientas_ia.md)
+- Anterior: [← Herramientas de IA](08_herramientas_ia.md)
