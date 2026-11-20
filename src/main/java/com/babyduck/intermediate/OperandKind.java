@@ -15,6 +15,11 @@ public enum OperandKind {
     CONSTANT,
     /** Letrero de print ("hola") */
     STRING,
-    /** Marca interna de una expresión con error; nunca aparece en un cuádruplo */
+    /** Número de cuádruplo: destino de un GOTO o GOTOF (no es una dirección de memoria) */
+    QUAD_INDEX,
+    /**
+     * Marca interna de una expresión con error; nunca aparece en una fila entregada
+     * (si hubo errores, la fila se descarta)
+     */
     ERROR
 }

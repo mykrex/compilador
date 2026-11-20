@@ -40,6 +40,15 @@ public final class QuadrupleQueue {
         return quadruples.size() - 1;
     }
 
+    /**
+     * Rellena el destino de un salto ya generado: reemplaza el cuádruplo por uno igual con
+     * ese resultado (los cuádruplos son inmutables)
+     */
+    void fill(int index, Operand target) {
+        Quadruple q = quadruples.get(index);
+        quadruples.set(index, new Quadruple(q.op(), q.left(), q.right(), target));
+    }
+
     /** Agrega una nota antes del próximo cuádruplo que se genere */
     void addNote(String text) {
         notes.add(new Note(quadruples.size(), text));
@@ -118,10 +127,16 @@ public final class QuadrupleQueue {
         sb.append(line.toString().stripTrailing()).append('\n');
     }
 
-    /** Texto de un operando según el estilo: nombre, dirección, o dirección(nombre) */
+    /**
+     * Texto de un operando según el estilo: nombre, dirección, o dirección(nombre).
+     * El destino de un salto es un número de cuádruplo y se imprime igual en los tres estilos
+     */
     private static String show(Operand operand, Style style) {
         if (operand == null) {
             return EMPTY;
+        }
+        if (operand.kind() == OperandKind.QUAD_INDEX) {
+            return operand.name();
         }
         return switch (style) {
             case SYMBOLIC -> operand.name();

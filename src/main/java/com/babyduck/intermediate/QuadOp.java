@@ -11,8 +11,6 @@ import com.babyduck.semantic.Op;
  * Cada operador tiene un código numérico fijo, escrito a mano (no se usa ordinal(),
  * que cambiaría si alguien reordena el enum). En memoria el cuádruplo guarda el enum;
  * el código se usará al escribir el archivo que lee la máquina virtual
- *
- * Los códigos 15 en adelante quedan para los saltos y las funciones (entregas siguientes)
  */
 public enum QuadOp {
     PLUS(1, "+"),
@@ -28,7 +26,9 @@ public enum QuadOp {
     PRINT(11, "PRINT"),
     PRINTLN(12, "PRINTLN"),
     READ(13, "READ"),
-    END(14, "END");
+    END(14, "END"),
+    GOTO(15, "GOTO"),
+    GOTOF(16, "GOTOF");
 
     private final int code;
     private final String symbol;

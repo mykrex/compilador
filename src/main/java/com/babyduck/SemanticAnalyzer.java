@@ -26,13 +26,13 @@ import java.util.List;
  * declaraciones repetidas. También valida el uso: variables y funciones
  * no declaradas, llamadas, asignaciones, condiciones, expresiones y return
  *
- * Además genera los cuádruplos de las expresiones y los estatutos lineales con
- * {@link QuadrupleGenerator}. Las expresiones no devuelven su tipo: dejan su resultado
+ * Además genera los cuádruplos de las expresiones, los estatutos lineales y los saltos
+ * de if y while con {@link QuadrupleGenerator}. Las expresiones no devuelven su tipo: dejan su resultado
  * (operando y tipo) en las pilas del generador, y quien las usa lo saca de ahí.
  * Si una parte de una expresión ya es ERROR, ese error ya se reportó y no se reporta otro
  *
  * Se usa un Visitor, aunque ya no devuelva tipos, porque permite acciones a mitad de
- * una regla (necesarias para los saltos de if y while en la siguiente entrega)
+ * una regla (por ejemplo, el GOTOF entre la condición y el cuerpo de un if o un while)
  */
 public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
 
@@ -188,31 +188,34 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
         return null;
     }
 
-    /** Los saltos llegan en la siguiente entrega; por ahora se marcan con notas */
+    /**
+     * {@code if (condición) {...} else {...};} — GOTOF después de la condición; con else,
+     * GOTO al terminar el primer cuerpo; los saltos se rellenan con la pila de saltos
+     */
     @Override
     public Void visitCondition(BabyDuckParser.ConditionContext ctx) {
         TypedOperand condition = checkCondition(ctx.expression(), "if");
-        generator.note("if (línea " + ctx.IF().getSymbol().getLine() + "): aquí irá GotoF "
-                + condition.operand());
+        generator.startIf(condition.operand());                          // if: GOTOF después de la condición
         visit(ctx.body(0));
         if (ctx.ELSE() != null) {
-            generator.note("else: aquí irá Goto al final del if y se rellenará el GotoF");
+            generator.startElse();                                       // else: GOTO y se rellena el GOTOF
             visit(ctx.body(1));
-            generator.note("fin del if: aquí se rellenará el Goto");
-        } else {
-            generator.note("fin del if: aquí se rellenará el GotoF");
         }
+        generator.endIf();                                               // fin del if: se rellena el salto pendiente
         return null;
     }
 
+    /**
+     * {@code while (condición) do {...};} — se guarda el inicio de la condición, GOTOF
+     * después de ella, y al final GOTO al inicio y se rellena el GOTOF
+     */
     @Override
     public Void visitCycle(BabyDuckParser.CycleContext ctx) {
-        generator.note("inicio del while (línea " + ctx.WHILE().getSymbol().getLine()
-                + "): destino del Goto de regreso");
+        generator.markLoopStart();                                       // while: inicio de la condición
         TypedOperand condition = checkCondition(ctx.expression(), "while");
-        generator.note("aquí irá GotoF " + condition.operand());
+        generator.startLoopBody(condition.operand());                    // while: GOTOF después de la condición
         visit(ctx.body());
-        generator.note("fin del while: aquí irá Goto al inicio y se rellenará el GotoF");
+        generator.endLoop();                                             // fin del while: GOTO al inicio y se rellena el GOTOF
         return null;
     }
 

@@ -9,7 +9,8 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 
 /**
- * Generador de cuádruplos: las tres pilas (operadores, operandos y tipos) y la fila
+ * Generador de cuádruplos: las pilas de expresiones (operadores, operandos y tipos),
+ * la pila de saltos y la fila
  *
  * SemanticAnalyzer lo llama desde sus puntos neurálgicos. Esta clase no conoce el árbol
  * de ANTLR ni el ErrorCollector: detecta los errores de tipos al sacar operandos de las
@@ -38,6 +39,7 @@ public final class QuadrupleGenerator {
     private final Deque<OperatorEntry> operators = new ArrayDeque<>();   // pila de operadores
     private final Deque<Operand> operands = new ArrayDeque<>();          // pila de operandos
     private final Deque<Type> types = new ArrayDeque<>();                // pila de tipos
+    private final Deque<Integer> jumps = new ArrayDeque<>();             // pila de saltos (números de cuádruplo)
     private final QuadrupleQueue queue = new QuadrupleQueue();           // fila de cuádruplos
     private final VirtualMemory memory = new VirtualMemory();            // direcciones virtuales
     private final ConstantTable constants = new ConstantTable(memory);   // tabla de constantes
@@ -124,6 +126,11 @@ public final class QuadrupleGenerator {
         tempCount++;
         return new Operand(OperandKind.TEMPORARY, "t" + tempCount, type, null,
                 memory.allocate(Segment.TEMPORARY, type));
+    }
+
+    /** Número de cuádruplo como operando: destino de un salto (sin tipo ni dirección) */
+    public Operand quadIndex(int index) {
+        return new Operand(OperandKind.QUAD_INDEX, String.valueOf(index), null, null, -1);
     }
 
     // Pilas de operandos y de tipos (siempre juntas)
@@ -274,6 +281,60 @@ public final class QuadrupleGenerator {
         emit(QuadOp.END, null, null, null);
     }
 
+    // Saltos: la pila de saltos guarda números de cuádruplo pendientes de rellenar (o el
+    // regreso de un while). Si la condición ya era ERROR, el GOTOF se genera igual para que
+    // la pila no se desbalancee; con errores la fila se descarta
+
+    /** if, después de la condición: (GOTOF, condición, _, ?) y su número a la pila de saltos */
+    public void startIf(Operand condition) {
+        jumps.push(emit(QuadOp.GOTOF, condition, null, null));
+    }
+
+    /**
+     * else, antes de su cuerpo: (GOTO, _, _, ?) para saltar el else; el GOTOF del if se
+     * rellena con el inicio del else y el GOTO queda en la pila de saltos
+     */
+    public void startElse() {
+        int jumpOverElse = emit(QuadOp.GOTO, null, null, null);
+        fillJump(jumps.pop(), queue.nextIndex());
+        jumps.push(jumpOverElse);
+    }
+
+    /** Fin del if (o del else): el salto pendiente se rellena con el siguiente cuádruplo */
+    public void endIf() {
+        fillJump(jumps.pop(), queue.nextIndex());
+    }
+
+    /** while, antes de la condición: el número del siguiente cuádruplo es el destino del regreso */
+    public void markLoopStart() {
+        jumps.push(queue.nextIndex());
+    }
+
+    /** while, después de la condición: (GOTOF, condición, _, ?) y su número a la pila de saltos */
+    public void startLoopBody(Operand condition) {
+        jumps.push(emit(QuadOp.GOTOF, condition, null, null));
+    }
+
+    /**
+     * Fin del while: (GOTO, _, _, inicio) para volver a evaluar la condición, y el GOTOF se
+     * rellena con el cuádruplo que sigue al ciclo
+     */
+    public void endLoop() {
+        int exit = jumps.pop();
+        int loopStart = jumps.pop();
+        emit(QuadOp.GOTO, null, null, quadIndex(loopStart));
+        fillJump(exit, queue.nextIndex());
+    }
+
+    /** true si no quedan saltos pendientes (al terminar el programa debe estar vacía) */
+    public boolean jumpsEmpty() {
+        return jumps.isEmpty();
+    }
+
+    private void fillJump(int jump, int target) {
+        queue.fill(jump, quadIndex(target));
+    }
+
     /** Nota en la posición actual de la fila: texto que se muestra antes del próximo cuádruplo */
     public void note(String text) {
         queue.addNote(text);
@@ -284,7 +345,8 @@ public final class QuadrupleGenerator {
         return operators.isEmpty() && operands.isEmpty() && types.isEmpty();
     }
 
-    private void emit(QuadOp op, Operand left, Operand right, Operand result) {
-        queue.add(new Quadruple(op, left, right, result));
+    /** Agrega el cuádruplo al final de la fila y regresa su número */
+    private int emit(QuadOp op, Operand left, Operand right, Operand result) {
+        return queue.add(new Quadruple(op, left, right, result));
     }
 }

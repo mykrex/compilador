@@ -251,6 +251,43 @@ class QuadrupleGeneratorTest {
         assertEquals(1, gen.queue().notes().get(0).position());
     }
 
+    /** while (_A_ < 3) { if (_A_ > 1) {...} else {...} }: cada salto apunta a su destino */
+    @Test
+    void saltosDeWhileConIfElse() {
+        Operand a = var("_A_", Type.INT);
+        gen.markLoopStart();                                     // regreso: cuádruplo 0
+        gen.pushOperand(a);
+        gen.pushOperator(Op.LT, 1, 0);
+        gen.pushOperand(gen.constant("3", Type.INT));
+        gen.generateBinary();
+        gen.startLoopBody(gen.popOperand().operand());
+        gen.pushOperand(a);
+        gen.pushOperator(Op.GT, 1, 0);
+        gen.pushOperand(gen.constant("1", Type.INT));
+        gen.generateBinary();
+        gen.startIf(gen.popOperand().operand());
+        gen.emitPrintln();                                       // cuerpo del if
+        gen.startElse();
+        gen.emitPrintln();                                       // cuerpo del else
+        gen.endIf();
+        gen.endLoop();
+        gen.emitEnd();
+
+        assertEquals("""
+                0 < _A_ 3 t1
+                1 GOTOF t1 _ 8
+                2 > _A_ 1 t2
+                3 GOTOF t2 _ 6
+                4 PRINTLN _ _ _
+                5 GOTO _ _ 7
+                6 PRINTLN _ _ _
+                7 GOTO _ _ 0
+                8 END _ _ _
+                """, listing());
+        assertTrue(gen.jumpsEmpty());
+        assertTrue(gen.stacksEmpty());
+    }
+
     @Test
     void codigosFijosDeLosOperadores() {
         assertEquals(1, QuadOp.PLUS.code());
