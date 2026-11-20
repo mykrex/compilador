@@ -3,8 +3,8 @@ package com.babyduck.intermediate;
 /**
  * Clase de un operando de los cuádruplos
  *
- * Con la memoria virtual cada clase tendrá su propio rango de direcciones
- * (variables globales/locales, temporales, constantes y letreros)
+ * Las variables, los temporales, las constantes y los letreros tienen su propio rango
+ * de direcciones virtuales (ver {@link VirtualMemory})
  */
 public enum OperandKind {
     /** Variable o parámetro declarado por el programador */

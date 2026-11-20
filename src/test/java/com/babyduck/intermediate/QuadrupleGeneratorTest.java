@@ -22,8 +22,9 @@ class QuadrupleGeneratorTest {
     private final SemanticCube cube = new SemanticCube();
     private final QuadrupleGenerator gen = new QuadrupleGenerator(cube);
 
+    /** Variable global con su dirección, como la declara el analizador */
     private Operand var(String name, Type type) {
-        return gen.variable(new VariableInfo(name, type));
+        return gen.variable(new VariableInfo(name, type, gen.memory().allocate(Segment.GLOBAL, type)));
     }
 
     /** Lo que hace el analizador al terminar un factor dentro de un término */

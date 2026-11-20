@@ -21,7 +21,8 @@ import static org.junit.jupiter.api.Assertions.*;
  *
  * valid: el programa no tiene errores y su fila, en estilo SYMBOLIC, es igual al bloque
  *   {@code // cuadruplos:} del archivo (se ignoran los espacios repetidos). Se compara el
- *   texto impreso, nunca objetos con equals. SYMBOLIC no cambiará con la memoria virtual
+ *   texto impreso, nunca objetos con equals. Si el archivo trae el bloque
+ *   {@code // direcciones:}, también se compara la fila en estilo ADDRESS (códigos y direcciones)
  * invalid: cada línea {@code // esperado: ...} es un error semántico, en orden, y la fila es null
  * Q06 además compara las notas con su bloque {@code // nota: posición texto}
  */
@@ -29,6 +30,7 @@ class QuadrupleTest {
 
     private static final Path BASE = Path.of("src/test/resources/quads");
     private static final String QUADS_MARK = "// cuadruplos:";
+    private static final String ADDRESS_MARK = "// direcciones:";
     private static final String NOTE_PREFIX = "// nota:";
     private static final String EXPECTED_PREFIX = "// esperado:";
 
@@ -43,6 +45,13 @@ class QuadrupleTest {
             List<String> actual = normalize(List.of(
                     result.quadruples().format(QuadrupleQueue.Style.SYMBOLIC).split("\n")));
             assertEquals(String.join("\n", expected), String.join("\n", actual));
+
+            List<String> expectedAddresses = expectedBlock(path, ADDRESS_MARK);
+            if (!expectedAddresses.isEmpty()) {
+                List<String> actualAddresses = normalize(List.of(
+                        result.quadruples().format(QuadrupleQueue.Style.ADDRESS).split("\n")));
+                assertEquals(String.join("\n", expectedAddresses), String.join("\n", actualAddresses));
+            }
         }));
     }
 
@@ -99,11 +108,16 @@ class QuadrupleTest {
 
     /** Líneas del bloque "// cuadruplos:": cada una empieza con su número de cuádruplo */
     private static List<String> expectedQuadruples(Path path) throws IOException {
+        return expectedBlock(path, QUADS_MARK);
+    }
+
+    /** Líneas numeradas que siguen a la marca (por ejemplo "// direcciones:"); vacía si no está */
+    private static List<String> expectedBlock(Path path, String mark) throws IOException {
         List<String> lines = new ArrayList<>();
         boolean inBlock = false;
         for (String line : Files.readAllLines(path)) {
             String trimmed = line.strip();
-            if (trimmed.equals(QUADS_MARK)) {
+            if (trimmed.equals(mark)) {
                 inBlock = true;
             } else if (inBlock && trimmed.matches("//\\s*\\d+\\s.*")) {
                 lines.add(trimmed.substring(2));

@@ -39,6 +39,9 @@ public class Main {
             System.out.println();
             System.out.println("=== Cuádruplos ===");
             System.out.print(result.quadruples().format(QuadrupleQueue.Style.FULL));
+            System.out.println();
+            System.out.println("=== Tabla de constantes ===");
+            System.out.print(result.constants());
         } else {
             System.out.println("Se encontraron " + result.errors().size() + " error(es) en " + path + ":");
             result.errors().forEach(e -> System.out.println("  " + e));

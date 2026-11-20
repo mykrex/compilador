@@ -39,7 +39,9 @@ public final class QuadrupleGenerator {
     private final Deque<Operand> operands = new ArrayDeque<>();          // pila de operandos
     private final Deque<Type> types = new ArrayDeque<>();                // pila de tipos
     private final QuadrupleQueue queue = new QuadrupleQueue();           // fila de cuádruplos
-    private int tempCount = 0;
+    private final VirtualMemory memory = new VirtualMemory();            // direcciones virtuales
+    private final ConstantTable constants = new ConstantTable(memory);   // tabla de constantes
+    private int tempCount = 0;                                           // solo para el nombre t1, t2, ...
 
     public QuadrupleGenerator(SemanticCube cube) {
         this.cube = cube;
@@ -49,50 +51,79 @@ public final class QuadrupleGenerator {
         return queue;
     }
 
-    // Fábrica de operandos: único lugar donde se crean (en la entrega 4 asignarán dirección)
+    /** Contadores de direcciones; SemanticAnalyzer la usa para las variables declaradas */
+    public VirtualMemory memory() {
+        return memory;
+    }
 
-    /** Operando de una variable o parámetro ya declarado */
+    public ConstantTable constants() {
+        return constants;
+    }
+
+    // Fábrica de operandos: único lugar donde se crean y donde reciben su dirección virtual
+
+    /**
+     * Operando de una variable o parámetro ya declarado, con la dirección que recibió al declararse
+     *
+     * @return el operando, o {@link Operand#ERROR} si la variable no cupo en su rango (ya reportado)
+     * @throws IllegalStateException si la variable no tiene dirección: es un error del compilador
+     */
     public Operand variable(VariableInfo variable) {
-        return new Operand(OperandKind.VARIABLE, variable.name(), variable.type(), null);
+        if (variable.address() == VariableInfo.NO_ADDRESS) {
+            throw new IllegalStateException("La variable " + variable.name() + " no tiene dirección");
+        }
+        if (variable.address() == VirtualMemory.OVERFLOW) {
+            return Operand.ERROR;
+        }
+        return new Operand(OperandKind.VARIABLE, variable.name(), variable.type(), null, variable.address());
     }
 
     /**
      * Operando de una constante numérica, convirtiendo su texto. Si el signo va pegado,
      * el texto lo incluye ("-2147483648" es válido aunque "2147483648" no quepa en int)
      *
+     * La dirección sale de la tabla de constantes, con el valor ya convertido como llave
+     *
      * @return la constante, o {@link Operand#ERROR} si no cabe en su tipo
      *         (int fuera de rango, o float que resulta infinito); quien llama reporta
      */
     public Operand constant(String text, Type type) {
+        Object value;
         switch (type) {
             case INT -> {
                 try {
-                    return new Operand(OperandKind.CONSTANT, text, Type.INT, Integer.parseInt(text));
+                    value = Integer.parseInt(text);
                 } catch (NumberFormatException e) {
                     return Operand.ERROR;
                 }
             }
             case FLOAT -> {
-                double value = Double.parseDouble(text);
-                if (Double.isInfinite(value)) {
+                double parsed = Double.parseDouble(text);
+                if (Double.isInfinite(parsed)) {
                     return Operand.ERROR;
                 }
-                return new Operand(OperandKind.CONSTANT, text, Type.FLOAT, value);
+                value = parsed;
             }
             default -> throw new IllegalArgumentException("Tipo de constante inválido: " + type);
         }
+        return new Operand(OperandKind.CONSTANT, text, type, value, constants.addressOf(type, value));
     }
 
     /** Operando de un letrero; el valor es el contenido sin comillas (los escapes se interpretan en la máquina virtual) */
     public Operand string(String literal) {
         String content = literal.substring(1, literal.length() - 1);
-        return new Operand(OperandKind.STRING, literal, Type.STRING, content);
+        return new Operand(OperandKind.STRING, literal, Type.STRING, content,
+                constants.addressOf(Type.STRING, content));
     }
 
-    /** Temporal nuevo: t1, t2, ... (contador simple, sin reutilizar) */
+    /**
+     * Temporal nuevo, sin reutilizar. El nombre (t1, t2, ...) sigue un contador de todo el
+     * programa; la dirección sale del segmento temporal, que se reinicia en cada función y main
+     */
     public Operand newTemp(Type type) {
         tempCount++;
-        return new Operand(OperandKind.TEMPORARY, "t" + tempCount, type, null);
+        return new Operand(OperandKind.TEMPORARY, "t" + tempCount, type, null,
+                memory.allocate(Segment.TEMPORARY, type));
     }
 
     // Pilas de operandos y de tipos (siempre juntas)
@@ -243,7 +274,7 @@ public final class QuadrupleGenerator {
         emit(QuadOp.END, null, null, null);
     }
 
-    /** Nota en la posición actual de la fila (código que se generará en entregas siguientes) */
+    /** Nota en la posición actual de la fila: texto que se muestra antes del próximo cuádruplo */
     public void note(String text) {
         queue.addNote(text);
     }

@@ -1,9 +1,11 @@
 package com.babyduck;
 
+import com.babyduck.intermediate.ConstantTable;
 import com.babyduck.intermediate.Operand;
 import com.babyduck.intermediate.Outcome;
 import com.babyduck.intermediate.QuadrupleGenerator;
 import com.babyduck.intermediate.QuadrupleQueue;
+import com.babyduck.intermediate.Segment;
 import com.babyduck.intermediate.TypedOperand;
 import com.babyduck.semantic.FunctionDirectory;
 import com.babyduck.semantic.FunctionDirectory.NameKind;
@@ -55,6 +57,11 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
         return generator.queue();
     }
 
+    /** Tabla de constantes con sus direcciones (solo es válida si no hubo errores) */
+    public ConstantTable constants() {
+        return generator.constants();
+    }
+
     // Programa
 
     @Override
@@ -71,6 +78,7 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
             visit(function);
         }
         currentFunction = null;                                          // main solo ve globales
+        generator.memory().startScope();                                 // inicio de main: temporales desde la base
         if (hasFunctions) {
             generator.note("inicio de main: aquí se rellenará el Goto a main");
         }
@@ -118,7 +126,8 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
         }
 
         currentFunction = function;
-        if (ctx.params() != null) {
+        generator.memory().startScope();                                 // inicio de función: locales y temporales desde la base
+        if (ctx.params() != null) {                                      // los parámetros reciben las primeras direcciones locales
             visit(ctx.params());
         }
         if (ctx.vars() != null) {
@@ -155,7 +164,9 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
             visitStatements(ctx.statement());
             return null;
         }
-        return visitChildren(ctx);
+        visitChildren(ctx);
+        reportMemoryOverflow(ctx.getStart());                            // temporales o constantes que ya no cupieron
+        return null;
     }
 
     /**
@@ -355,7 +366,6 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
      */
     private void declareVariable(Token token, Type type, boolean isParam) {
         String name = token.getText();
-        VariableInfo variable = new VariableInfo(name, type);
 
         if (currentFunction == null) {                                   // global
             NameKind use = directory.globalUse(name);
@@ -364,7 +374,7 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
             } else if (use != null) {
                 error(token, name + " ya se usa como " + describe(use));
             } else {
-                directory.globals().add(variable);
+                directory.globals().add(withAddress(token, name, type, Segment.GLOBAL));
             }
             return;
         }
@@ -379,10 +389,31 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
             error(token, name + " ya se usa como " + describe(use));
             return;
         }
+        VariableInfo variable = withAddress(token, name, type, Segment.LOCAL);
         if (isParam) {
             currentFunction.addParam(variable);
         } else {
             currentFunction.addLocal(variable);
+        }
+    }
+
+    /**
+     * Variable con la siguiente dirección libre del segmento. Solo se pide cuando la
+     * declaración es válida, así una declaración repetida no gasta direcciones
+     */
+    private VariableInfo withAddress(Token token, String name, Type type, Segment segment) {
+        VariableInfo variable = new VariableInfo(name, type, generator.memory().allocate(segment, type));
+        reportMemoryOverflow(token);
+        return variable;
+    }
+
+    /**
+     * Reporta los rangos de direcciones que se llenaron (variables, temporales o constantes).
+     * Cada rango se reporta una sola vez; si la variable no cupo, sus usos no generan más errores
+     */
+    private void reportMemoryOverflow(Token where) {
+        for (String message : generator.memory().takeOverflows()) {
+            error(where, message);
         }
     }
 

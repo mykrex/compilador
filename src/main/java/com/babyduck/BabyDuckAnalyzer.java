@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.tree.ParseTree;
 
+import com.babyduck.intermediate.ConstantTable;
 import com.babyduck.intermediate.QuadrupleQueue;
 import com.babyduck.semantic.FunctionDirectory;
 
@@ -20,12 +21,14 @@ public final class BabyDuckAnalyzer {
 
     /**
      * Resultado del análisis: el árbol de parse, la lista de errores, el directorio de
-     * funciones y la fila de cuádruplos (null si hubo cualquier error: se descarta)
+     * funciones, la fila de cuádruplos y la tabla de constantes (estas dos son null si hubo
+     * cualquier error: se descartan)
      */
     public record Result(BabyDuckParser parser, ParseTree tree,
                          List<ErrorCollector.CompileError> errors,
                          FunctionDirectory directory,
-                         QuadrupleQueue quadruples) {
+                         QuadrupleQueue quadruples,
+                         ConstantTable constants) {
         public boolean isValid() {
             return errors.isEmpty();
         }
@@ -44,7 +47,7 @@ public final class BabyDuckAnalyzer {
         parser.addErrorListener(errors);
 
         ParseTree tree = parser.program();      // regla inicial de la gramática
-        return new Result(parser, tree, errors.getErrors(), null, null);
+        return new Result(parser, tree, errors.getErrors(), null, null, null);
     }
 
     /**
@@ -61,7 +64,9 @@ public final class BabyDuckAnalyzer {
         SemanticAnalyzer semantic = new SemanticAnalyzer(errors);
         semantic.visit(syntax.tree());
         QuadrupleQueue quadruples = errors.hasErrors() ? null : semantic.quadruples();
-        return new Result(syntax.parser(), syntax.tree(), errors.getErrors(), semantic.directory(), quadruples);
+        ConstantTable constants = errors.hasErrors() ? null : semantic.constants();
+        return new Result(syntax.parser(), syntax.tree(), errors.getErrors(), semantic.directory(),
+                quadruples, constants);
     }
 
     /** Ejecuta solo el lexer y regresa la lista de tokens (sin EOF) */
