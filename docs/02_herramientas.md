@@ -8,9 +8,10 @@
 4. [Análisis sintáctico](04_sintaxis.md)
 5. [Análisis semántico](05_semantica.md)
 6. [Código intermedio](06_codigo_intermedio.md)
-7. [Testing](07_testing.md)
-8. [Herramientas de IA](08_herramientas_ia.md)
-9. [Guía de uso](09_guia_de_uso.md)
+7. [Memoria virtual](07_memoria_virtual.md)
+8. [Testing](08_testing.md)
+9. [Herramientas de IA](09_herramientas_ia.md)
+10. [Guía de uso](10_guia_de_uso.md)
 
 ---
 
@@ -45,7 +46,7 @@ Se buscó la herramienta que:
 - Está escrito en Java y genera clases Java listas para usar (`Lexer`, `Parser`, `Listener`, `Visitor`).
 - Lexer y parser se definen en **un solo archivo** con notación EBNF (`?`, `*`, `+`).
 - Su algoritmo ALL(\*) resuelve automáticamente reglas que empiezan con el mismo token, sin indicar el _lookahead_ a mano.
-- Genera _listeners_ y _visitors_ con métodos `enter…`/`exit…`/`visit…` por regla, útiles para colocar acciones semánticas en las siguientes entregas.
+- Genera _listeners_ y _visitors_ con métodos `enter…`/`exit…`/`visit…` por regla, útiles para colocar acciones semánticas sin tocar la gramática.
 - El plugin de IntelliJ muestra el árbol de parseo en vivo (ANTLR Preview).
 - Desventaja: ante una ambigüedad elige en silencio la primera alternativa en lugar de reportar un conflicto.
 
@@ -87,7 +88,7 @@ Se eligió **ANTLR 4.13.2** por las siguientes razones:
 2. **Documentación:** la más completa de las herramientas analizadas.
 3. **Compatibilidad con la gramática:** la CFG de BabyDuck ya estaba escrita en estilo LL (sin recursión izquierda), por lo que se transcribió directamente.
 4. **Facilidad de aprendizaje y depuración:** el parser descendente sigue la estructura de la gramática y el árbol puede visualizarse en el IDE.
-5. **Siguientes entregas:** los _listeners_ y _visitors_ generados permiten insertar los puntos neurálgicos semánticos sin modificar la gramática.
+5. **Puntos neurálgicos fuera de la gramática:** el _visitor_ generado permite colocar las validaciones semánticas y la generación de cuádruplos sin modificar el `.g4`.
 
 ---
 

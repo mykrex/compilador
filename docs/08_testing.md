@@ -8,9 +8,10 @@
 4. [Análisis sintáctico](04_sintaxis.md)
 5. [Análisis semántico](05_semantica.md)
 6. [Código intermedio](06_codigo_intermedio.md)
-7. **Testing** (este capítulo)
-8. [Herramientas de IA](08_herramientas_ia.md)
-9. [Guía de uso](09_guia_de_uso.md)
+7. [Memoria virtual](07_memoria_virtual.md)
+8. **Testing** (este capítulo)
+9. [Herramientas de IA](09_herramientas_ia.md)
+10. [Guía de uso](10_guia_de_uso.md)
 
 ---
 
@@ -23,14 +24,14 @@ Las pruebas validan por separado cada fase implementada:
 | Léxica            | `LexerTest.java`                                                                 | La secuencia exacta de tokens que genera una entrada, o que produzca un error léxico                                                                             |
 | Sintáctica        | `ParserTest.java`                                                                | Que un programa completo se acepte sin errores, o que produzca un error sintáctico                                                                               |
 | Semántica         | `SemanticCubeTest`, `VariableTableTest`, `FunctionDirectoryTest`, `SemanticTest` | Estructuras semánticas y programas válidos o con un error semántico (casos en [Análisis semántico: Pruebas](05_semantica.md#pruebas))                            |
-| Código intermedio | `QuadrupleGeneratorTest`, `QuadrupleTest`                                        | Pilas, fila y tipos de los temporales; fila de cuádruplos de programas completos ([Casos de prueba de código intermedio](#casos-de-prueba-de-código-intermedio)) |
+| Código intermedio | `QuadrupleGeneratorTest`, `VirtualMemoryTest`, `QuadrupleTest`                   | Pilas, saltos, fila y tipos de los temporales; direcciones virtuales; fila de cuádruplos de programas completos ([Casos de prueba de código intermedio](#casos-de-prueba-de-código-intermedio)) |
 
 Criterios:
 
 - **Casos válidos:** deben analizarse con **cero errores**.
 - **Casos inválidos:** deben producir al menos un error, y **el primero debe ser de la fase que se prueba** (léxico en `LexerTest`, sintáctico en `ParserTest`). Así una prueba de sintaxis no pasa "por accidente" debido a un error del lexer.
 - Cada caso inválido contiene **un solo error intencional**, para identificar claramente la causa.
-- Los casos de sintaxis son archivos `.bd` en `src/test/resources/syntax/valid` e `invalid`. Cada archivo inicia con un comentario que describe qué valida.
+- Los casos de sintaxis son archivos `.bd` en `src/test/resources/sintaxis/valid` e `invalid`. Cada archivo inicia con un comentario que describe qué valida.
 
 ## Ejecución
 
@@ -41,7 +42,7 @@ mvn test
 Resultado esperado (todas las fases):
 
 ```
-Tests run: 113, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 123, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
@@ -162,18 +163,20 @@ end
 
 ## Casos de prueba de código intermedio
 
-- `QuadrupleGeneratorTest`: pilas y fila sin el parser (algoritmo con y sin fondo falso, asociatividad, tipo de cada temporal, errores por las pilas, signo, asignación, límites de constantes, códigos de operadores, formato).
+- `QuadrupleGeneratorTest`: pilas y fila sin el parser (algoritmo con y sin fondo falso, asociatividad, tipo de cada temporal, errores por las pilas, signo, asignación, límites de constantes, códigos de operadores, saltos de un `while` con `if-else`, formatos de impresión).
+- `VirtualMemoryTest`: base de cada segmento y tipo, reinicio de locales y temporales por función, rango lleno reportado una vez, constantes con el mismo valor en la misma dirección, nombre único de los temporales y rechazo de una variable sin dirección.
+- `FunctionDirectoryTest`: al liberar la tabla local se conservan parámetros con dirección, inicio y tamaños.
 - `QuadrupleTest`, sobre `src/test/resources/quads/`:
-  - **Válidos:** sin errores, y la fila en estilo SYMBOLIC igual al bloque `// cuadruplos:` del archivo (se compara texto, ignorando espacios repetidos; no cambiará con las direcciones).
-  - **Notas (Q06):** la lista de notas y su posición, contra las líneas `// nota:`.
+  - **Válidos:** sin errores, y la fila en estilo SYMBOLIC (nombres) igual al bloque `// cuadruplos:` del archivo; si el archivo trae el bloque `// direcciones:`, también la fila en estilo ADDRESS (códigos y direcciones). Se compara texto, ignorando espacios repetidos.
   - **Inválidos:** cada `// esperado:` es un error semántico, en orden, y la fila es nula.
 
 ```
 _X_ = _A_ * (_B_ + _C_);        // en Q01
 // cuadruplos:
-// 0 + _B_ _C_ t1
-// 1 * _A_ t1 t2
-// 2 = t2 _ _X_
+// 0 GOTO _ _ 1
+// 1 + _B_ _C_ t1
+// 2 * _A_ t1 t2
+// 3 = t2 _ _X_
 ```
 
 | ID  | Qué valida                                                                       | Resultado |
@@ -183,12 +186,15 @@ _X_ = _A_ * (_B_ + _C_);        // en Q01
 | Q03 | Precedencia mixta y los cuatro relacionales en `print`                           | ✓         |
 | Q04 | Letreros, varios elementos, escapes y un `PRINTLN` por estatuto                  | ✓         |
 | Q05 | `read`, promoción `int → float` sin conversión y división                        | ✓         |
-| Q06 | Funciones, llamada con fondo falso en el argumento, `if`/`else`, `while`; notas  | ✓         |
+| Q06 | Funciones `void` y con valor, llamada como estatuto y en una expresión, `if`/`else` y `while` (con direcciones) | ✓         |
 | Q07 | `2147483648` y un flotante de 309 dígitos no caben: dos errores, fila nula       | ✓         |
+| Q08 | Direcciones de globales, parámetros (antes que las locales), locales, temporales reiniciados en `main` y constantes repetidas (`2.5` y `2.50`) | ✓         |
+| Q09 | `if` sin `else`, `if-else` y `while` con un `if` anidado: cada `GOTOF`/`GOTO` con su destino | ✓         |
+| Q10 | Factorial recursivo con `return` anticipado, `f(5) + f(3)`, llamada anidada `f(g(1))` y función con valor como estatuto | ✓         |
 
 ---
 
 ## Navegación
 
-- Anterior: [← Código intermedio](06_codigo_intermedio.md)
-- Siguiente: [Herramientas de IA →](08_herramientas_ia.md)
+- Anterior: [← Memoria virtual](07_memoria_virtual.md)
+- Siguiente: [Herramientas de IA →](09_herramientas_ia.md)

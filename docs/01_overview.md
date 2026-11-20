@@ -11,9 +11,10 @@
 4. [Análisis sintáctico](04_sintaxis.md)
 5. [Análisis semántico](05_semantica.md)
 6. [Código intermedio](06_codigo_intermedio.md)
-7. [Testing](07_testing.md)
-8. [Herramientas de IA](08_herramientas_ia.md)
-9. [Guía de uso](09_guia_de_uso.md)
+7. [Memoria virtual](07_memoria_virtual.md)
+8. [Testing](08_testing.md)
+9. [Herramientas de IA](09_herramientas_ia.md)
+10. [Guía de uso](10_guia_de_uso.md)
 
 ---
 
@@ -21,7 +22,7 @@
 
 Este proyecto implementa un compilador para **BabyDuck**, un mini-lenguaje imperativo con variables enteras y flotantes, funciones con parámetros, condiciones, ciclos y entrada/salida.
 
-El compilador se desarrolla en **Java** y usa **ANTLR4** para generar automáticamente el analizador léxico (Scanner) y el analizador sintáctico (Parser) a partir de un archivo de gramática.
+El compilador se desarrolla en **Java** y usa **ANTLR4** para generar automáticamente el analizador léxico (Scanner) y el analizador sintáctico (Parser) a partir de un archivo de gramática. Sobre el árbol de parseo, un solo recorrido valida la semántica, asigna las direcciones virtuales y genera el código intermedio (cuádruplos).
 
 ## Tecnologías
 
@@ -33,16 +34,21 @@ El compilador se desarrolla en **Java** y usa **ANTLR4** para generar automátic
 | Pruebas automáticas              | JUnit 5                         |
 | IDE                              | IntelliJ IDEA + plugin ANTLR v4 |
 
-## Flujo del compilador (estado actual)
+## Flujo del compilador
 
 ```mermaid
 flowchart LR
     A[Programa .bd] --> B[BabyDuckLexer<br/>Scanner]
     B -->|tokens| C[BabyDuckParser<br/>Parser]
-    C --> D[Árbol de parseo]
+    C -->|árbol de parseo| D[SemanticAnalyzer<br/>semántica + direcciones + cuádruplos]
+    D --> F[Directorio de funciones,<br/>fila de cuádruplos y<br/>tabla de constantes]
     B -.->|errores léxicos| E[ErrorCollector]
     C -.->|errores sintácticos| E
+    D -.->|errores semánticos| E
 ```
+
+La semántica solo corre si no hubo errores léxicos ni sintácticos; si encuentra errores, la fila
+de cuádruplos se descarta.
 
 ## Estructura del proyecto
 
@@ -55,15 +61,17 @@ compilador/
     │   ├── antlr4/com/babyduck/BabyDuck.g4  Gramática: tokens + reglas
     │   └── java/com/babyduck/
     │       ├── Main.java                    Punto de entrada
-    │       ├── BabyDuckAnalyzer.java        Ejecuta lexer + parser
-    │       └── ErrorCollector.java          Recolecta errores léxicos y sintácticos
+    │       ├── BabyDuckAnalyzer.java        Ejecuta lexer + parser y, si no hay errores, la semántica
+    │       ├── ErrorCollector.java          Recolecta errores léxicos, sintácticos y semánticos
+    │       ├── SemanticAnalyzer.java        Recorrido del árbol: puntos neurálgicos
+    │       ├── semantic/                    Tipos, cubo semántico, tablas y directorio de funciones
+    │       └── intermediate/                Cuádruplos, pilas, fila y memoria virtual
     └── test/
-        ├── java/com/babyduck/
-        │   ├── LexerTest.java               Pruebas del Scanner
-        │   └── ParserTest.java              Pruebas del Parser
-        └── resources/syntax/
-            ├── valid/                       Programas que deben aceptarse
-            └── invalid/                     Programas que deben rechazarse
+        ├── java/com/babyduck/               Pruebas JUnit por fase (y semantic/, intermediate/)
+        └── resources/
+            ├── sintaxis/                    Programas .bd de sintaxis (valid/ e invalid/)
+            ├── semantic/                    Programas .bd de semántica
+            └── quads/                       Programas .bd con su fila de cuádruplos esperada
 ```
 
 Las clases `BabyDuckLexer`, `BabyDuckParser`, `BabyDuckListener` y `BabyDuckVisitor` **no se escriben a mano**: el plugin de Maven las genera desde `BabyDuck.g4` en cada compilación, dentro de `target/generated-sources/antlr4/`.
@@ -81,16 +89,18 @@ Para analizar un programa (en IntelliJ, como _Program arguments_ de `Main`):
 <archivo.bd> [--tokens]
 ```
 
-- Sin `--tokens`: indica si el programa es válido e imprime el árbol de parseo, o lista los errores.
+- Sin `--tokens`: si el programa es válido imprime el árbol de parseo, el directorio de funciones, la fila de cuádruplos y la tabla de constantes; si no, lista los errores.
 - Con `--tokens`: además imprime la lista de tokens reconocidos.
 
 ## Avance por entrega
 
-| Entrega | Contenido                                                         | Estado    |
-| ------- | ----------------------------------------------------------------- | --------- |
-| 1       | Expresiones regulares, tokens y gramática libre de contexto (CFG) | ✓         |
-| 2       | Selección de herramienta, Scanner, Parser y Test-Plan             | ✓         |
-| 3       | Análisis semántico                                                | Pendiente |
+| Entrega | Contenido                                                         | Estado |
+| ------- | ----------------------------------------------------------------- | ------ |
+| 0       | Expresiones regulares, tokens y gramática libre de contexto (CFG) | ✓      |
+| 1       | Selección de herramienta, Scanner, Parser y Test-Plan             | ✓      |
+| 2       | Cubo semántico, directorio de funciones y tablas de variables     | ✓      |
+| 3       | Cuádruplos de expresiones y estatutos lineales                    | ✓      |
+| 4       | Saltos, funciones y direcciones virtuales                         | ✓      |
 
 ---
 

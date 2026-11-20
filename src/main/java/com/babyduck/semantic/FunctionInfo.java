@@ -20,7 +20,7 @@ import java.util.List;
  */
 public final class FunctionInfo {
 
-    /** Valor de los datos que todavía no se conocen (inicio, dirección de regreso de una void) */
+    /** Valor de un dato que no aplica o no se ha guardado (por ejemplo, la dirección de regreso de una void) */
     public static final int UNKNOWN = -1;
 
     private final String name;

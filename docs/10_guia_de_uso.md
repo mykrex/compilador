@@ -8,13 +8,14 @@
 4. [Análisis sintáctico](04_sintaxis.md)
 5. [Análisis semántico](05_semantica.md)
 6. [Código intermedio](06_codigo_intermedio.md)
-7. [Testing](07_testing.md)
-8. [Herramientas de IA](08_herramientas_ia.md)
-9. **Guía de uso** (este capítulo)
+7. [Memoria virtual](07_memoria_virtual.md)
+8. [Testing](08_testing.md)
+9. [Herramientas de IA](09_herramientas_ia.md)
+10. **Guía de uso** (este capítulo)
 
 ---
 
-> **Estado de la guía.** Cubre lo que el compilador ya hace: revisar el léxico, la sintaxis y la semántica de un programa, y generar el código intermedio (cuádruplos) de sus expresiones y estatutos lineales. Las secciones de ejecución (entrada, salida y errores en tiempo de ejecución) se completarán cuando estén listas la memoria y la máquina virtual; están marcadas como _pendiente_.
+> **Alcance de la guía.** Describe lo que hace el compilador: revisar el léxico, la sintaxis y la semántica de un programa y generar su código intermedio (cuádruplos con direcciones virtuales).
 
 Esta guía está pensada para alguien que quiere **escribir programas en BabyDuck**. Explica cómo se escribe un programa, qué reglas sigue el compilador, qué errores puede encontrar y cómo corregirlos. El porqué de cada regla está en los capítulos técnicos (por ejemplo, [Análisis Semántico](05_semantica.md)).
 
@@ -63,7 +64,7 @@ java -cp "target/classes:$(cat cp.txt)" com.babyduck.Main ejemplos/factorial.bd
 
 ### Qué muestra el compilador
 
-**Si el programa es correcto**, imprime `Programa válido`, el árbol sintáctico, el directorio de funciones (las variables y funciones que encontró) y la fila de cuádruplos (el código intermedio, ver [Ejecución de programas](#ejecución-de-programas)):
+**Si el programa es correcto**, imprime `Programa válido`, el árbol sintáctico, el directorio de funciones (las variables con su dirección y, por función, su inicio, sus parámetros y cuánta memoria usa), la fila de cuádruplos y la tabla de constantes (ver [Código intermedio](#código-intermedio)):
 
 ```text
 Programa válido: ejemplos/factorial.bd
@@ -71,13 +72,20 @@ Programa válido: ejemplos/factorial.bd
 
 === Directorio de funciones ===
 Programa: _Factorial_
-Globales: [_N_:int, _R_:int]
-_Fact_ -> int
-  params:  [_K_:int]
-  locales: [_K_:int]
+Globales: [_N_:int@1000, _R_:int@1001]
+Segmento global: int 3, float 0, bool 0
+Temporales de main: int 1, float 0, bool 0
+_Fact_ -> int (regreso en 1002)
+  inicio:      1
+  params:      [_K_:int@3000]
+  locales:     int 1, float 0, bool 0
+  temporales:  int 3, float 0, bool 1
 
 === Cuádruplos ===
 #  op   izq  der  res
+...
+
+=== Tabla de constantes ===
 ...
 ```
 
@@ -172,7 +180,7 @@ Una constante entera que no cabe en un `int`, o una flotante tan grande que no p
 
 Texto entre comillas dobles, por ejemplo `"Resultado: "`. Solo pueden usarse dentro de `print`. No pueden ocupar más de una línea. Se aceptan secuencias con diagonal invertida, como `\"` o `\\`.
 
-> _Pendiente:_ el efecto de las secuencias de escape al imprimir se definirá con la máquina virtual.
+En el código intermedio, el letrero se guarda tal como está escrito, con sus secuencias sin interpretar.
 
 ### Comentarios
 
@@ -450,10 +458,6 @@ Los errores léxicos y sintácticos los genera ANTLR y aparecen en inglés. Los 
 | `la función _F_ no regresa un valor en todos los caminos`            | Algún camino termina sin `return`                                                    | Agrega `else` con `return`, o un `return` al final |
 | `código inalcanzable: hay un return antes de este estatuto`          | Estatutos después de un `return`                                                     | Muévelos antes del `return` o elimínalos           |
 
-### Errores en tiempo de ejecución
-
-> _Pendiente (máquina virtual):_ división entre cero, uso de una variable sin valor asignado, entrada inválida en `read`.
-
 ---
 
 ## Ejemplos de programas válidos
@@ -557,35 +561,33 @@ Este ejemplo muestra:
 
 ---
 
-## Ejecución de programas
+## Código intermedio
 
-### Ver el código intermedio
+Cuando el programa no tiene errores, el compilador muestra, después del directorio de funciones, la **fila de cuádruplos**: las instrucciones que ejecutará la máquina virtual. Cada renglón es `(operador, izquierdo, derecho, resultado)` y cada operando aparece como `dirección(nombre)`; los `t1`, `t2`… son resultados intermedios que crea el compilador y `_` indica un campo vacío. El cuádruplo 0 siempre salta al inicio de `main`. Al final aparece la tabla de constantes (cada valor distinto, con su dirección).
 
-Cuando el programa no tiene errores, el compilador muestra, después del directorio de funciones, la **fila de cuádruplos**: las instrucciones que ejecutará la máquina virtual. Cada renglón es `(operador, izquierdo, derecho, resultado)`; los `t1`, `t2`… son resultados intermedios que crea el compilador y `_` indica un campo vacío.
+Con `var _A_, _B_, _C_, _X_ : int;`:
 
 ```text
 _X_ = (_A_ + _B_) * -_C_;
 print("x = ", _X_);
 
 === Cuádruplos ===
-#  op       izq     der  res
-0  +        _A_     _B_  t1
-1  UMINUS   _C_     _    t2
-2  *        t1      t2   t3
-3  =        t3      _    _X_
-4  PRINT    "x = "  _    _
-5  PRINT    _X_     _    _
-6  PRINTLN  _       _    _
-7  END      _       _    _
+#  op       izq            der        res
+0  GOTO     _              _          1
+1  +        1000(_A_)      1001(_B_)  5000(t1)
+2  UMINUS   1002(_C_)      _          5001(t2)
+3  *        5000(t1)       5001(t2)   5002(t3)
+4  =        5002(t3)       _          1003(_X_)
+5  PRINT    10000("x = ")  _          _
+6  PRINT    1003(_X_)      _          _
+7  PRINTLN  _              _          _
+8  END      _              _          _
+
+=== Tabla de constantes ===
+10000  string  "x = "
 ```
 
-### Lo que todavía no genera código
-
-Por ahora se generan los cuádruplos de las expresiones, las asignaciones, `print` y `read`. Los programas con `if`, `while`, funciones, llamadas o `return` también se compilan: se generan las partes lineales que contienen (la condición, los argumentos, los cuerpos), y en el lugar donde irán los saltos y las llamadas aparece una nota que empieza con `·`, por ejemplo `· if (línea 5): aquí irá GotoF t1`. Esas partes se completarán en las siguientes entregas.
-
-### Ejecutar un programa
-
-> _Pendiente (memoria virtual y máquina virtual)._ Esta sección explicará cómo ejecutar un programa compilado, cómo introducir datos con `read` y cómo se muestran los resultados de `print`.
+Los `if` y `while` generan saltos (`GOTOF` si la condición es falsa, `GOTO` incondicional) y las llamadas generan `ERA`, `PARAM` y `GOSUB`; el detalle está en [Código intermedio](06_codigo_intermedio.md) y la distribución de direcciones en [Memoria virtual](07_memoria_virtual.md).
 
 ---
 
@@ -634,4 +636,4 @@ end
 
 ## Navegación
 
-- Anterior: [← Herramientas de IA](08_herramientas_ia.md)
+- Anterior: [← Herramientas de IA](09_herramientas_ia.md)

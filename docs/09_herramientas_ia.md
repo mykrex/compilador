@@ -8,9 +8,10 @@
 4. [Análisis sintáctico](04_sintaxis.md)
 5. [Análisis semántico](05_semantica.md)
 6. [Código intermedio](06_codigo_intermedio.md)
-7. [Testing](07_testing.md)
-8. **Herramientas de IA** (este capítulo)
-9. [Guía de uso](09_guia_de_uso.md)
+7. [Memoria virtual](07_memoria_virtual.md)
+8. [Testing](08_testing.md)
+9. **Herramientas de IA** (este capítulo)
+10. [Guía de uso](10_guia_de_uso.md)
 
 ---
 
@@ -59,16 +60,37 @@ La forma de trabajo fue por bloques que se podían probar antes de seguir. Para 
 | Representación de los cuádruplos        | Opciones para los operandos (nombres, direcciones, dos representaciones) y para los operadores (enum existente, enum nuevo con códigos, enteros)                              | Elección de operandos como objetos con clase y métodos de fábrica, tipo interno para letreros y enum con códigos fijos; preparación para la memoria virtual |
 | Algoritmo de expresiones                | Explicación del fondo falso con el Visitor; detección de que también se necesita en los argumentos de una llamada                                                             | Decisión de seguir el algoritmo de clase (revisar el tope después de cada operando) y de los casos de prueba de paréntesis y asociatividad                  |
 | Signo y constantes                      | Comparación entre `UMINUS`, `0 - x` y constante negativa                                                                                                                      | Decisión: constante negativa cuando el signo va pegado, `UMINUS` en los demás casos; revisión de constantes que no caben, con signo                         |
-| Estatutos y lo que aún no genera código | Propuestas para `print`, `read`, fin del programa y notas en la fila                                                                                                          | Decisión de `PRINTLN` por estatuto sin espacio automático, `END` y la nota de `Goto` a main                                                                 |
+| Estatutos y notas en la fila            | Propuestas para `print`, `read`, fin del programa y notas en la fila                                                                                                          | Decisión de `PRINTLN` por estatuto sin espacio automático, `END` y la nota de `Goto` a main                                                                 |
 | Errores                                 | Propuesta del operando de error y del reparto: el generador detecta y el recorrido reporta                                                                                    | Aceptación con la condición de conservar los mensajes                                                                                                       |
 | Código                                  | Generación del paquete `intermediate` (operandos, cuádruplos, fila, generador) y de los cambios a `Type`, `SemanticAnalyzer`, `BabyDuckAnalyzer` y `Main`                     | Integración en el proyecto; ejecución de `mvn test`                                                                                                         |
 | Verificación                            | Comparación, carácter por carácter, de la lista de errores (mensaje, línea y columna) antes y después del cambio, sobre las pruebas semánticas y dos programas con 49 errores | Revisión de los resultados                                                                                                                                  |
 | Pruebas                                 | `QuadrupleGeneratorTest` y propuesta de los casos de cuádruplos                                                                                                               | Selección de los casos que debía cubrir cada regla                                                                                                          |
 | Documentación                           | Borrador del capítulo de código intermedio y actualización de semántica, guía de uso y este registro                                                                          | Revisión y edición final                                                                                                                                    |
 
+## Entrega 4: Estatutos no lineales, funciones y direcciones virtuales
+
+**Herramienta:** Claude Code (Anthropic), modelo Opus 5.5, dentro del editor
+
+**Forma de trabajo.** La herramienta trabajó sobre el repositorio con reglas fijas: proponer
+opciones con ventajas, desventajas y una recomendación antes de cada decisión de diseño; no hacer
+commits (solo sugerir el mensaje); documentar solo el estado actual. El trabajo se dividió en cuatro
+bloques (direcciones, saltos, funciones y documentación); al terminar cada uno, las pruebas se
+corrieron en IntelliJ (120, 122 y 123 pruebas, sin fallas) y se hizo el commit antes de seguir.
+
+| Actividad | Uso de la IA | Trabajo propio / verificación |
+| --- | --- | --- |
+| Plan y limpieza | Revisión de lo que pide la entrega contra el repositorio; propuesta de bloques; renumeración de los archivos de `docs/` con sus índices y ligas | Elección de la convención de nombres (numerados desde 01, títulos sin número) y de la versión de Java |
+| Distribución de memoria | Opciones para los rangos de direcciones, la reutilización de temporales, los códigos nuevos y los operandos que no son direcciones | Elección de cada opción, con precisiones: la tabla de constantes usa el valor convertido; los parámetros reciben dirección antes que las locales; ninguna variable sin dirección llega a un cuádruplo; los tamaños se guardan antes de reiniciar los contadores |
+| Saltos | Plan con el algoritmo de clase (pila de saltos y relleno) y su implementación | Revisión del plan y ejecución de las pruebas |
+| Funciones | Plan de `GOTO` a main, `ERA`, `PARAM`, `GOSUB`, `RETURN`, `ENDFUNC`, tamaños y liberación de la tabla local | Precisiones antes de implementar: generar `ERA`, `PARAM` y `GOSUB` después de evaluar todos los argumentos (por las llamadas anidadas), `PARAM` en orden y sin copia del resultado cuando la llamada es un estatuto; casos de prueba que lo demuestran |
+| Código | Generación de `VirtualMemory`, `ConstantTable`, `Segment`, `MemorySize` y de los cambios al generador, al analizador y al directorio | Integración y ejecución de las pruebas en IntelliJ |
+| Pruebas | Programas Q06, Q08, Q09 y Q10 con su fila esperada en nombres y en direcciones, calculada a mano; `VirtualMemoryTest` | Revisión de los casos y ejecución |
+| Puntos neurálgicos | Propuesta de la numeración secuencial con su tabla de equivalencias; diagramas nuevos (`<CONDITION>`, `<CYCLE>`, `<F_Call>`, `<Return>`) en `.drawio`, conservando las ediciones hechas a mano | Correcciones a la tabla: el punto de condición se comparte entre `if` y `while`, la revisión de todos los caminos se queda donde la hace el código, y el código inalcanzable queda como regla sin número; exportación de las imágenes |
+| Documentación | Borradores de memoria virtual, código intermedio, semántica, testing y este registro | Revisión y edición final |
+
 ---
 
 ## Navegación
 
-- Anterior: [← Testing](07_testing.md)
-- Siguiente: [Guía de uso →](09_guia_de_uso.md)
+- Anterior: [← Testing](08_testing.md)
+- Siguiente: [Guía de uso →](10_guia_de_uso.md)

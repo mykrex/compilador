@@ -8,9 +8,10 @@
 4. [Análisis sintáctico](04_sintaxis.md)
 5. [Análisis semántico](05_semantica.md)
 6. [Código intermedio](06_codigo_intermedio.md)
-7. [Testing](07_testing.md)
-8. [Herramientas de IA](08_herramientas_ia.md)
-9. [Guía de uso](09_guia_de_uso.md)
+7. [Memoria virtual](07_memoria_virtual.md)
+8. [Testing](08_testing.md)
+9. [Herramientas de IA](09_herramientas_ia.md)
+10. [Guía de uso](10_guia_de_uso.md)
 
 ---
 
