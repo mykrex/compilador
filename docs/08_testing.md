@@ -19,11 +19,11 @@
 
 Las pruebas validan por separado cada fase implementada:
 
-| Fase              | Clase de prueba                                                                  | Qué verifica                                                                                                                                                     |
-| ----------------- | -------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Léxica            | `LexerTest.java`                                                                 | La secuencia exacta de tokens que genera una entrada, o que produzca un error léxico                                                                             |
-| Sintáctica        | `ParserTest.java`                                                                | Que un programa completo se acepte sin errores, o que produzca un error sintáctico                                                                               |
-| Semántica         | `SemanticCubeTest`, `VariableTableTest`, `FunctionDirectoryTest`, `SemanticTest` | Estructuras semánticas y programas válidos o con un error semántico (casos en [Análisis semántico: Pruebas](05_semantica.md#pruebas))                            |
+| Fase              | Clase de prueba                                                                  | Qué verifica                                                                                                                                                                                    |
+| ----------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Léxica            | `LexerTest.java`                                                                 | La secuencia exacta de tokens que genera una entrada, o que produzca un error léxico                                                                                                            |
+| Sintáctica        | `ParserTest.java`                                                                | Que un programa completo se acepte sin errores, o que produzca un error sintáctico                                                                                                              |
+| Semántica         | `SemanticCubeTest`, `VariableTableTest`, `FunctionDirectoryTest`, `SemanticTest` | Estructuras semánticas y programas válidos o con un error semántico (casos en [Análisis semántico: Pruebas](05_semantica.md#pruebas))                                                           |
 | Código intermedio | `QuadrupleGeneratorTest`, `VirtualMemoryTest`, `QuadrupleTest`                   | Pilas, saltos, fila y tipos de los temporales; direcciones virtuales; fila de cuádruplos de programas completos ([Casos de prueba de código intermedio](#casos-de-prueba-de-código-intermedio)) |
 
 Criterios:
@@ -45,8 +45,6 @@ Resultado esperado (todas las fases):
 Tests run: 123, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
-
-<!-- Agregar aquí la captura de la ventana de pruebas de IntelliJ con los 26 casos en verde -->
 
 ## Casos de prueba léxicos
 
@@ -179,18 +177,18 @@ _X_ = _A_ * (_B_ + _C_);        // en Q01
 // 3 = t2 _ _X_
 ```
 
-| ID  | Qué valida                                                                       | Resultado |
-| --- | -------------------------------------------------------------------------------- | --------- |
-| Q01 | `_A_ * (_B_ + _C_)`, `(_A_ + _B_) * _C_`, `_A_ - (_B_ - _C_)`, `_A_ - _B_ - _C_` | ✓         |
-| Q02 | `-2`, `-_A_`, `-(_A_ + 1)`, `_A_ - -2`, `+_A_`, `-2147483648`, `-(2)`            | ✓         |
-| Q03 | Precedencia mixta y los cuatro relacionales en `print`                           | ✓         |
-| Q04 | Letreros, varios elementos, escapes y un `PRINTLN` por estatuto                  | ✓         |
-| Q05 | `read`, promoción `int → float` sin conversión y división                        | ✓         |
-| Q06 | Funciones `void` y con valor, llamada como estatuto y en una expresión, `if`/`else` y `while` (con direcciones) | ✓         |
-| Q07 | `2147483648` y un flotante de 309 dígitos no caben: dos errores, fila nula       | ✓         |
+| ID  | Qué valida                                                                                                                                     | Resultado |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| Q01 | `_A_ * (_B_ + _C_)`, `(_A_ + _B_) * _C_`, `_A_ - (_B_ - _C_)`, `_A_ - _B_ - _C_`                                                               | ✓         |
+| Q02 | `-2`, `-_A_`, `-(_A_ + 1)`, `_A_ - -2`, `+_A_`, `-2147483648`, `-(2)`                                                                          | ✓         |
+| Q03 | Precedencia mixta y los cuatro relacionales en `print`                                                                                         | ✓         |
+| Q04 | Letreros, varios elementos, escapes y un `PRINTLN` por estatuto                                                                                | ✓         |
+| Q05 | `read`, promoción `int → float` sin conversión y división                                                                                      | ✓         |
+| Q06 | Funciones `void` y con valor, llamada como estatuto y en una expresión, `if`/`else` y `while` (con direcciones)                                | ✓         |
+| Q07 | `2147483648` y un flotante de 309 dígitos no caben: dos errores, fila nula                                                                     | ✓         |
 | Q08 | Direcciones de globales, parámetros (antes que las locales), locales, temporales reiniciados en `main` y constantes repetidas (`2.5` y `2.50`) | ✓         |
-| Q09 | `if` sin `else`, `if-else` y `while` con un `if` anidado: cada `GOTOF`/`GOTO` con su destino | ✓         |
-| Q10 | Factorial recursivo con `return` anticipado, `f(5) + f(3)`, llamada anidada `f(g(1))` y función con valor como estatuto | ✓         |
+| Q09 | `if` sin `else`, `if-else` y `while` con un `if` anidado: cada `GOTOF`/`GOTO` con su destino                                                   | ✓         |
+| Q10 | Factorial recursivo con `return` anticipado, `f(5) + f(3)`, llamada anidada `f(g(1))` y función con valor como estatuto                        | ✓         |
 
 ---
 

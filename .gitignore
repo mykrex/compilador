@@ -40,3 +40,4 @@ build/
 
 # Ignorar la carpeta de respaldos/versiones
 *docs/diagramas/v1/
+*docs/diagramas/v2/
