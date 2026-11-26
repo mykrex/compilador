@@ -31,7 +31,7 @@
   - Ventaja: ningún identificador puede confundirse con una palabra reservada, porque estas van en minúscula y no empiezan con `_`.
   - Las funciones también son identificadores: `_Factorial_(5)`.
 - **Flotantes:** requieren dígitos a ambos lados del punto; `3.` y `.5` no son válidos.
-- **Letreros:** van entre comillas dobles, no pueden contener saltos de línea y admiten secuencias de escape con `\` (por ejemplo `\"`). Solo se usan dentro de `print`.
+- **Letreros:** van entre comillas dobles, no pueden contener saltos de línea y admiten secuencias de escape con `\` (por ejemplo `\"`). Solo se usan dentro de `print`. El léxico acepta cualquier carácter después de `\`; qué secuencias se interpretan al imprimir está en la guía de uso.
 - **Comentarios** (extensión): de una línea, con `//`. Se descartan junto con espacios, tabuladores y saltos de línea.
 
 ## Tokens

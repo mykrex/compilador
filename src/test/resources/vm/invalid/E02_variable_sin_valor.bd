@@ -1,0 +1,10 @@
+// E02: una variable global que nunca recibió valor se usa en una expresión
+program _E02_;
+var _A_, _B_ : int;
+main {
+    _A_ = 1;
+    _A_ = _A_ + _B_;
+}
+end
+
+// esperado: Error de ejecución en el cuádruplo 2: la dirección 1001 no tiene valor

@@ -1,0 +1,50 @@
+// V05: recursión (factorial y Fibonacci con dos llamadas en una expresión) y return anticipado en una función void recursiva
+program _V05_;
+var _I_ : int;
+int _Fact_(_N_ : int) [ {
+    if (_N_ < 2) {
+        return 1;
+    };
+    return _N_ * _Fact_(_N_ - 1);
+} ];
+int _Fib_(_N_ : int) [ {
+    if (_N_ < 2) {
+        return _N_;
+    };
+    return _Fib_(_N_ - 1) + _Fib_(_N_ - 2);
+} ];
+void _Cuenta_(_N_ : int) [ {
+    if (_N_ == 0) {
+        print("despegue");
+        return;
+    };
+    print(_N_);
+    _Cuenta_(_N_ - 1);
+} ];
+main {
+    print("5! = ", _Fact_(5));
+    print("10! = ", _Fact_(10));
+    _I_ = 0;
+    while (_I_ < 8) do {
+        print("fib(", _I_, ") = ", _Fib_(_I_));
+        _I_ = _I_ + 1;
+    };
+    _Cuenta_(3);
+}
+end
+
+// salida:
+// 5! = 120
+// 10! = 3628800
+// fib(0) = 0
+// fib(1) = 1
+// fib(2) = 1
+// fib(3) = 2
+// fib(4) = 3
+// fib(5) = 5
+// fib(6) = 8
+// fib(7) = 13
+// 3
+// 2
+// 1
+// despegue

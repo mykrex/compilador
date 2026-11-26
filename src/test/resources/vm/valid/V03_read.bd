@@ -1,0 +1,24 @@
+// V03: read de int y de float (un entero leído en un float se promueve) y cálculo con lo leído
+program _V03_;
+var _N_ : int; _X_, _Y_ : float;
+main {
+    read(_N_);
+    read(_X_);
+    read(_Y_);
+    print("n = ", _N_);
+    print("x = ", _X_);
+    print("y = ", _Y_);
+    print("n * x + y = ", _N_ * _X_ + _Y_);
+}
+end
+
+// entrada:
+// 3
+// 2.5
+// -4
+
+// salida:
+// n = 3
+// x = 2.5
+// y = -4.0
+// n * x + y = 3.5

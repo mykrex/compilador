@@ -1,0 +1,37 @@
+// V04: funciones void y con valor, variable local, promoción en el argumento, global modificada desde una función, llamada anidada, dos llamadas en una expresión y función con valor usada como estatuto
+program _V04_;
+var _G_ : int; _R_ : float;
+int _Doble_(_P_ : int) [ {
+    return _P_ * 2;
+} ];
+float _Mitad_(_V_ : float) [ var _T_ : float; {
+    _T_ = _V_ / 2;
+    return _T_;
+} ];
+void _Incrementa_(_K_ : int) [ {
+    _G_ = _G_ + _K_;
+} ];
+int _Suma_(_A_ : int, _B_ : int) [ {
+    return _A_ + _B_;
+} ];
+main {
+    _G_ = 10;
+    _Incrementa_(5);
+    print("G = ", _G_);
+    print(_Doble_(_Doble_(3)));
+    print(_Doble_(4) + _Doble_(1));
+    _R_ = _Mitad_(_G_);
+    print("R = ", _R_);
+    print(_Suma_(_Doble_(2), _G_ - 5));
+    _Doble_(100);
+    print("G sigue en ", _G_);
+}
+end
+
+// salida:
+// G = 15
+// 12
+// 10
+// R = 7.5
+// 14
+// G sigue en 15

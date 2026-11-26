@@ -1,0 +1,40 @@
+// V02: while con acumulador, if-else anidado dentro de un ciclo, ciclo que no entra e if sin else
+program _V02_;
+var _I_, _S_ : int;
+main {
+    _I_ = 1;
+    _S_ = 0;
+    while (_I_ < 11) do {
+        _S_ = _S_ + _I_;
+        _I_ = _I_ + 1;
+    };
+    print("suma = ", _S_);
+    _I_ = 0;
+    while (_I_ < 4) do {
+        if (_I_ == 0) {
+            print(_I_, " cero");
+        } else {
+            if (_I_ != 2) {
+                print(_I_, " distinto de dos");
+            } else {
+                print(_I_, " dos");
+            };
+        };
+        _I_ = _I_ + 1;
+    };
+    while (_I_ < 0) do {
+        print("nunca");
+    };
+    if (_I_ > 3) {
+        print("fin con ", _I_);
+    };
+}
+end
+
+// salida:
+// suma = 55
+// 0 cero
+// 1 distinto de dos
+// 2 dos
+// 3 distinto de dos
+// fin con 4

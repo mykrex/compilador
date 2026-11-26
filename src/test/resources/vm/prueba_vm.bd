@@ -1,0 +1,17 @@
+program _Prueba_;
+var _N_, _R_ : int;
+
+int _Fact_(_K_ : int) [
+    {
+        if (_K_ < 2) { return 1; };
+        return _K_ * _Fact_(_K_ - 1);
+    }
+];
+
+main {
+    _N_ = 5;
+    _R_ = _Fact_(_N_) + _Fact_(3);
+    print("fact(5) + fact(3) = ", _R_);
+    print("7 / 2 = ", 7 / 2);
+}
+end

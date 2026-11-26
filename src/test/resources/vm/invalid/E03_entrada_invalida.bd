@@ -1,0 +1,13 @@
+// E03: read de un int que recibe un número con punto decimal
+program _E03_;
+var _N_ : int;
+main {
+    read(_N_);
+    print(_N_);
+}
+end
+
+// entrada:
+// 2.5
+
+// esperado: Error de ejecución en el cuádruplo 1: se esperaba un int y se leyó "2.5"

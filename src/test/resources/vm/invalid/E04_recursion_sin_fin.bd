@@ -1,0 +1,12 @@
+// E04: recursión sin caso base: se excede el límite de llamadas anidadas
+program _E04_;
+var _A_ : int;
+int _F_(_N_ : int) [ {
+    return _F_(_N_ + 1);
+} ];
+main {
+    _A_ = _F_(1);
+}
+end
+
+// esperado: Error de ejecución en el cuádruplo 4: se excedió el límite de 10000 llamadas anidadas

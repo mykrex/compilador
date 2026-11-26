@@ -178,7 +178,16 @@ Una constante entera que no cabe en un `int`, o una flotante tan grande que no p
 
 ### Letreros
 
-Texto entre comillas dobles, por ejemplo `"Resultado: "`. Solo pueden usarse dentro de `print`. No pueden ocupar más de una línea. Se aceptan secuencias con diagonal invertida, como `\"` o `\\`.
+Texto entre comillas dobles, por ejemplo `"Resultado: "`. Solo pueden usarse dentro de `print`. No pueden ocupar más de una línea. Se aceptan secuencias con diagonal invertida; al imprimir, la máquina virtual interpreta cuatro:
+
+| Secuencia | Se imprime |
+|---|---|
+| `\n` | salto de línea |
+| `\t` | tabulador |
+| `\"` | comilla doble |
+| `\\` | diagonal invertida |
+
+Cualquier otro carácter después de `\` se imprime tal cual, sin la diagonal: `"\a"` imprime `a`.
 
 En el código intermedio, el letrero se guarda tal como está escrito, con sus secuencias sin interpretar.
 

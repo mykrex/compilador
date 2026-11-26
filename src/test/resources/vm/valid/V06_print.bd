@@ -1,0 +1,26 @@
+// V06: print de varios elementos sin espacio automático, float, bool y letreros con secuencias \n, \t, \", \\ y otra letra
+program _V06_;
+var _X_ : float;
+main {
+    _X_ = 3;
+    print("a", "b", 1, 2);
+    print("x = ", _X_, ", x / 2 = ", _X_ / 2);
+    print(1 < 2, " ", 2.5 == 2.5, " ", 3 != 3);
+    print("comillas: \"hola\"");
+    print("diagonal: \\");
+    print("uno\ndos");
+    print("a\tb");
+    print("\q");
+}
+end
+
+// salida:
+// ab12
+// x = 3.0, x / 2 = 1.5
+// true true false
+// comillas: "hola"
+// diagonal: \
+// uno
+// dos
+// a	b
+// q
