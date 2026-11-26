@@ -36,22 +36,51 @@ public final class VirtualMemory {
     /** Dirección que se regresa cuando el rango ya está lleno */
     public static final int OVERFLOW = -2;
 
+    /** Un rango de direcciones: a qué segmento y tipo pertenece */
+    public record Range(Segment segment, Type type) { }
+
+    /**
+     * Tabla de rangos: la posición i es el rango que empieza en i * 1000 (la posición 0 no se usa).
+     * El compilador la usa para asignar direcciones y la máquina virtual para traducirlas
+     */
+    private static final Range[] RANGES = {
+            null,
+            new Range(Segment.GLOBAL, Type.INT),        // 1000
+            new Range(Segment.GLOBAL, Type.FLOAT),      // 2000
+            new Range(Segment.LOCAL, Type.INT),         // 3000
+            new Range(Segment.LOCAL, Type.FLOAT),       // 4000
+            new Range(Segment.TEMPORARY, Type.INT),     // 5000
+            new Range(Segment.TEMPORARY, Type.FLOAT),   // 6000
+            new Range(Segment.TEMPORARY, Type.BOOL),    // 7000
+            new Range(Segment.CONSTANT, Type.INT),      // 8000
+            new Range(Segment.CONSTANT, Type.FLOAT),    // 9000
+            new Range(Segment.CONSTANT, Type.STRING),   // 10000
+    };
+
     private final Map<Segment, Map<Type, Integer>> bases = new EnumMap<>(Segment.class);
     private final Map<Segment, Map<Type, Integer>> counters = new EnumMap<>(Segment.class);
     private final Set<String> reported = new HashSet<>();     // rangos llenos ya avisados
     private final List<String> overflows = new ArrayList<>(); // mensajes pendientes de reportar
 
     public VirtualMemory() {
-        base(Segment.GLOBAL, Type.INT, 1000);
-        base(Segment.GLOBAL, Type.FLOAT, 2000);
-        base(Segment.LOCAL, Type.INT, 3000);
-        base(Segment.LOCAL, Type.FLOAT, 4000);
-        base(Segment.TEMPORARY, Type.INT, 5000);
-        base(Segment.TEMPORARY, Type.FLOAT, 6000);
-        base(Segment.TEMPORARY, Type.BOOL, 7000);
-        base(Segment.CONSTANT, Type.INT, 8000);
-        base(Segment.CONSTANT, Type.FLOAT, 9000);
-        base(Segment.CONSTANT, Type.STRING, 10000);
+        for (int i = 1; i < RANGES.length; i++) {
+            base(RANGES[i].segment(), RANGES[i].type(), i * SEGMENT_SIZE);
+        }
+    }
+
+    /**
+     * Segmento y tipo de una dirección: el rango es {@code dirección / 1000}
+     *
+     * @return el rango, o null si la dirección no pertenece a ninguno
+     */
+    public static Range rangeOf(int address) {
+        int index = address / SEGMENT_SIZE;
+        return (address >= 0 && index < RANGES.length) ? RANGES[index] : null;
+    }
+
+    /** Casilla de una dirección dentro de su rango: {@code dirección - base} */
+    public static int cellOf(int address) {
+        return address % SEGMENT_SIZE;
     }
 
     private void base(Segment segment, Type type, int address) {
