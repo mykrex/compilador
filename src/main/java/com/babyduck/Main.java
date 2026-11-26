@@ -2,16 +2,21 @@ package com.babyduck;
 
 import org.antlr.v4.runtime.CharStreams;
 import com.babyduck.intermediate.QuadrupleQueue;
+import com.babyduck.vm.RuntimeError;
+import com.babyduck.vm.VirtualMachine;
 import org.antlr.v4.runtime.Token;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.List;
 
 /**
  * Punto de entrada del compilador BabyDuck.
  *
  * Uso:
- *   java com.babyduck.Main programa.bd            analiza léxico + sintaxis + semántica y genera los cuádruplos
+ *   java com.babyduck.Main programa.bd            analiza léxico + sintaxis + semántica, genera los cuádruplos
+ *                                                 y, si no hay errores, los ejecuta en la máquina virtual
  *   java com.babyduck.Main programa.bd --tokens   además imprime la lista de tokens
  */
 public class Main {
@@ -42,6 +47,17 @@ public class Main {
             System.out.println();
             System.out.println("=== Tabla de constantes ===");
             System.out.print(result.constants());
+            System.out.println();
+            System.out.println("=== Ejecución ===");
+            VirtualMachine vm = new VirtualMachine(result.quadruples(), result.constants(), result.directory(),
+                    new BufferedReader(new InputStreamReader(System.in)), System.out);
+            try {
+                vm.run();
+            } catch (RuntimeError e) {
+                System.out.println();
+                System.out.println(e.getMessage());
+                System.exit(1);
+            }
         } else {
             System.out.println("Se encontraron " + result.errors().size() + " error(es) en " + path + ":");
             result.errors().forEach(e -> System.out.println("  " + e));

@@ -129,9 +129,9 @@ public final class QuadrupleGenerator {
                 memory.allocate(Segment.TEMPORARY, type));
     }
 
-    /** Número de cuádruplo como operando: destino de un salto (sin tipo ni dirección) */
+    /** Número de cuádruplo como operando: destino de un salto (sin tipo); guarda el número para la máquina virtual */
     public Operand quadIndex(int index) {
-        return new Operand(OperandKind.QUAD_INDEX, String.valueOf(index), null, null, -1);
+        return new Operand(OperandKind.QUAD_INDEX, String.valueOf(index), null, null, index);
     }
 
     /**

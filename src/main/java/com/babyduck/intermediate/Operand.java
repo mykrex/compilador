@@ -30,9 +30,9 @@ public final class Operand {
      * @param name    texto con el que se muestra: _X_, t1, -2, 3.14, "hola"
      * @param value   valor ya convertido de una constante (Integer o Double) o el contenido
      *                de un letrero (sin comillas); null para variables y temporales
-     * @param address dirección virtual (ver {@link VirtualMemory}); en una función, el número
-     *                de su primer cuádruplo; en un número de parámetro, la dirección local
-     *                del parámetro; -1 si no aplica
+     * @param address dirección virtual (ver {@link VirtualMemory}); en un destino de salto, el
+     *                número de cuádruplo; en una función, el número de su primer cuádruplo; en
+     *                un número de parámetro, la dirección local del parámetro; -1 si no aplica
      */
     Operand(OperandKind kind, String name, Type type, Object value, int address) {
         this.kind = kind;
@@ -59,8 +59,9 @@ public final class Operand {
     }
 
     /**
-     * Dirección virtual del operando. En una función es el número de su primer cuádruplo y en
-     * un número de parámetro, la dirección local del parámetro
+     * Dirección virtual del operando. En un destino de salto es el número de cuádruplo, en una
+     * función el número de su primer cuádruplo y en un número de parámetro, la dirección local
+     * del parámetro
      */
     public int address() {
         return address;
