@@ -108,7 +108,8 @@ public final class QuadrupleGenerator {
             }
             default -> throw new IllegalArgumentException("Tipo de constante inválido: " + type);
         }
-        return new Operand(OperandKind.CONSTANT, text, type, value, constants.addressOf(type, value));
+        // se muestra con el valor de la tabla, no con el texto del programa: 2.50 aparece como 2.5
+        return new Operand(OperandKind.CONSTANT, String.valueOf(value), type, value, constants.addressOf(type, value));
     }
 
     /** Operando de un letrero; el valor es el contenido sin comillas (los escapes se interpretan en la máquina virtual) */
@@ -133,14 +134,20 @@ public final class QuadrupleGenerator {
         return new Operand(OperandKind.QUAD_INDEX, String.valueOf(index), null, null, -1);
     }
 
-    /** Nombre de una función como operando de ERA y GOSUB (sin tipo ni dirección) */
-    public Operand function(String name) {
-        return new Operand(OperandKind.FUNCTION, name, null, null, -1);
+    /**
+     * Función como operando de ERA y GOSUB (sin tipo). Se muestra con su nombre y guarda el
+     * número de su primer cuádruplo, que la identifica en la fila con direcciones
+     */
+    public Operand function(String name, int startQuad) {
+        return new Operand(OperandKind.FUNCTION, name, null, null, startQuad);
     }
 
-    /** Número de parámetro (desde 1) como resultado de PARAM (sin tipo ni dirección) */
-    public Operand paramIndex(int k) {
-        return new Operand(OperandKind.PARAM_INDEX, String.valueOf(k), null, null, -1);
+    /**
+     * Parámetro k (desde 1) como resultado de PARAM (sin tipo). Se muestra como k y guarda
+     * la dirección local del parámetro, donde se copia el argumento
+     */
+    public Operand paramIndex(int k, int paramAddress) {
+        return new Operand(OperandKind.PARAM_INDEX, String.valueOf(k), null, null, paramAddress);
     }
 
     /**
@@ -382,20 +389,20 @@ public final class QuadrupleGenerator {
     }
 
     /** Llamada, después de evaluar los argumentos: (ERA, función, _, _) prepara su memoria */
-    public void emitEra(String function) {
-        emit(QuadOp.ERA, function(function), null, null);
+    public void emitEra(String function, int startQuad) {
+        emit(QuadOp.ERA, function(function, startQuad), null, null);
     }
 
-    /** (PARAM, argumento, _, k): copia el argumento al parámetro k (desde 1) */
-    public void emitParam(Operand argument, int k) {
+    /** (PARAM, argumento, _, k): copia el argumento al parámetro k (desde 1), en su dirección local */
+    public void emitParam(Operand argument, int k, int paramAddress) {
         if (!argument.isError()) {
-            emit(QuadOp.PARAM, argument, null, paramIndex(k));
+            emit(QuadOp.PARAM, argument, null, paramIndex(k, paramAddress));
         }
     }
 
     /** (GOSUB, función, _, inicio): salta al primer cuádruplo de la función */
     public void emitGosub(String function, int startQuad) {
-        emit(QuadOp.GOSUB, function(function), null, quadIndex(startQuad));
+        emit(QuadOp.GOSUB, function(function, startQuad), null, quadIndex(startQuad));
     }
 
     /**

@@ -108,15 +108,18 @@ public final class QuadrupleQueue {
 
     /**
      * Texto de un operando según el estilo: nombre, dirección, o dirección(nombre).
-     * Los operandos que no son direcciones (destino de un salto, función, número de
-     * parámetro) se imprimen igual en los tres estilos
+     * El destino de un salto se imprime igual en los tres estilos. Una función y un número
+     * de parámetro se imprimen con su nombre y k, salvo en ADDRESS, donde se imprime el
+     * número que guardan: el inicio de la función y la dirección del parámetro
      */
     private static String show(Operand operand, Style style) {
         if (operand == null) {
             return EMPTY;
         }
         if (!operand.hasAddress()) {
-            return operand.name();
+            boolean numbered = operand.kind() == OperandKind.FUNCTION
+                    || operand.kind() == OperandKind.PARAM_INDEX;
+            return (style == Style.ADDRESS && numbered) ? String.valueOf(operand.address()) : operand.name();
         }
         return switch (style) {
             case SYMBOLIC -> operand.name();

@@ -15,7 +15,7 @@
 
 ---
 
-> **Nota** este registro es un borrador. Revísar y ajústar para que describa con precisión cómo use la herramienta.
+> **Nota:** este registro es un borrador. Revisar y ajustar para que describa con precisión cómo use la herramienta.
 
 ## Entrega 1: Scanner, Parser y Test-Plan
 

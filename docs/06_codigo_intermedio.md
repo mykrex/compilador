@@ -51,14 +51,14 @@ un enum y los operandos son objetos; el texto solo aparece al imprimir.
 | 11, 12 | `PRINT`, `PRINTLN` | `(PRINT, elemento, _, _)`, `(PRINTLN, _, _, _)` |
 | 13, 14 | `READ`, `END` | `(READ, _, _, variable)`, `(END, _, _, _)` |
 | 15, 16 | `GOTO`, `GOTOF` | `(GOTO, _, _, destino)`, `(GOTOF, condición, _, destino)` |
-| 17 | `ERA` | `(ERA, función, _, _)`: prepara la memoria de la llamada |
-| 18 | `PARAM` | `(PARAM, argumento, _, k)`, con `k` desde 1 |
-| 19 | `GOSUB` | `(GOSUB, función, _, inicio)` |
+| 17 | `ERA` | `(ERA, función, _, _)`: prepara la memoria de la llamada; con direcciones, la función es su inicio |
+| 18 | `PARAM` | `(PARAM, argumento, _, k)`, con `k` desde 1; con direcciones, `k` es la dirección local del parámetro |
+| 19 | `GOSUB` | `(GOSUB, función, _, inicio)`; con direcciones, la función es su inicio |
 | 20 | `RETURN` | `(RETURN, valor, _, dirección de regreso)`; en una función `void`, `(RETURN, _, _, _)` |
 | 21 | `ENDFUNC` | `(ENDFUNC, _, _, _)` |
 
 - **`QuadOp` aparte de `Op`:** `Op` es lo que consulta el cubo; `QuadOp`, lo que ejecuta la máquina virtual. Códigos escritos a mano (no `ordinal()`).
-- **Operandos:** guardan clase, nombre, tipo, dirección virtual y, si son constantes, su valor convertido. Solo se crean con los métodos de fábrica (constructor no público), que son el único lugar donde reciben su dirección. El destino de un salto, una función y un número de parámetro son operandos sin dirección (`QUAD_INDEX`, `FUNCTION`, `PARAM_INDEX`).
+- **Operandos:** guardan clase, nombre, tipo, dirección virtual y, si son constantes, su valor convertido. Solo se crean con los métodos de fábrica (constructor no público), que son el único lugar donde reciben su dirección. El destino de un salto, una función y un número de parámetro son operandos que no son memoria (`QUAD_INDEX`, `FUNCTION`, `PARAM_INDEX`). La función guarda su inicio y el número de parámetro guarda la dirección local del parámetro: en la fila con direcciones se imprimen esos números, así la máquina virtual no necesita nombres (por ejemplo `ERA _Doble_` es `17 1 _ _` y `PARAM t2 _ 1` es `18 5000 _ 3000`).
 - **Temporales:** `t1, t2…` sin reutilizar; el nombre sigue un solo contador y la dirección se reinicia en cada función y en `main`.
 
 ## Estructuras

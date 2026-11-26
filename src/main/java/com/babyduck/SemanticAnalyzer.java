@@ -546,9 +546,10 @@ public class SemanticAnalyzer extends BabyDuckBaseVisitor<Void> {
         }
 
         // punto 21: ERA, PARAM por argumento, GOSUB y, en expresión, copia del regreso
-        generator.emitEra(name);                                         // ERA después de los argumentos
+        generator.emitEra(name, function.startQuad());                   // ERA después de los argumentos
         for (int i = 0; i < values.size(); i++) {
-            generator.emitParam(values.get(i), i + 1);                   // PARAM argumento _ k
+            generator.emitParam(values.get(i), i + 1,                    // PARAM argumento _ k
+                    function.params().get(i).address());
         }
         generator.emitGosub(name, function.startQuad());                 // GOSUB al inicio de la función
 

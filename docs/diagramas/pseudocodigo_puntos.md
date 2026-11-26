@@ -69,7 +69,7 @@ como destino del salto `n`.
 | 18 | Antes de cada `EXPRESIÓN` | `POper.meter(fondo falso)` |
 | 19 | Después de cada `EXPRESIÓN` | `POper.sacar()` (el fondo falso) |
 | 20 | Después de cada `EXPRESIÓN` (tras el 19) | `arg ← sacar(); si no cabe (cubo: parámetro k ← arg) → reportar; guardar arg en la lista de argumentos` |
-| 21 | Después de `)` | `Fila.agregar(ERA, función, _, _)`<br>`para k = 1..n: Fila.agregar(PARAM, argumento k, _, k)`<br>`Fila.agregar(GOSUB, función, _, función.inicio)`<br>`si está en una expresión: t ← temporal(tipo de la función); Fila.agregar(=, dirección de regreso, _, t); meter(t)` |
+| 21 | Después de `)` | `Fila.agregar(ERA, función(inicio), _, _)`<br>`para k = 1..n: Fila.agregar(PARAM, argumento k, _, k(dirección del parámetro k))`<br>`Fila.agregar(GOSUB, función(inicio), _, función.inicio)`<br>`si está en una expresión: t ← temporal(tipo de la función); Fila.agregar(=, dirección de regreso, _, t); meter(t)` |
 
 Los argumentos se evalúan todos antes del `ERA`: una llamada anidada, como `f(g(1))`, termina
 completa antes de preparar la memoria de `f`.

@@ -291,6 +291,26 @@ class QuadrupleGeneratorTest {
         assertTrue(gen.stacksEmpty());
     }
 
+    /** Llamada a una función que empieza en el cuádruplo 1 y cuyo parámetro está en 3000 */
+    @Test
+    void llamadaMuestraNombresODireccionesSegunElEstilo() {
+        Operand x = var("_X_", Type.INT);                        // 1000
+        gen.emitEra("_F_", 1);
+        gen.emitParam(x, 1, 3000);
+        gen.emitGosub("_F_", 1);
+
+        assertEquals("""
+                0 ERA _F_ _ _
+                1 PARAM _X_ _ 1
+                2 GOSUB _F_ _ 1
+                """, listing());
+        assertEquals("""
+                0 17 1 _ _
+                1 18 1000 _ 3000
+                2 19 1 _ 1
+                """, gen.queue().format(QuadrupleQueue.Style.ADDRESS));
+    }
+
     @Test
     void codigosFijosDeLosOperadores() {
         assertEquals(1, QuadOp.PLUS.code());

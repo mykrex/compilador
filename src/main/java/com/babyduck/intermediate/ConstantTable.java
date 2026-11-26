@@ -5,6 +5,7 @@ import com.babyduck.semantic.Type;
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
  * Tabla de constantes: cada valor distinto recibe una sola dirección del segmento de constantes
@@ -42,6 +43,16 @@ public final class ConstantTable {
     /** Cantidad de constantes distintas de ese tipo */
     public int size(Type type) {
         return table.getOrDefault(type, Map.of()).size();
+    }
+
+    /**
+     * Recorre todas las constantes como (dirección, valor): Integer, Double o el contenido del
+     * letrero. Así se carga la memoria de constantes sin consultar nombres
+     */
+    public void forEach(BiConsumer<Integer, Object> action) {
+        for (Map<Object, Integer> values : table.values()) {
+            values.forEach((value, address) -> action.accept(address, value));
+        }
     }
 
     /** Una línea por constante: dirección, tipo y valor (los letreros, entre comillas) */

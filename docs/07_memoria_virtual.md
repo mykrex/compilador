@@ -106,11 +106,11 @@ main { _G_ = _G_ + 2; _H_ = _H_ / 2.50; ... }
 2   =    5000(t1)   _        3001(_L_)
 ...
 10  +    1000(_G_)  8000(2)  5000(t4)
-12  /    2000(_H_)  9000(2.50)  6000(t5)
+12  /    2000(_H_)  9000(2.5)  6000(t5)
 ```
 
 `_P_` es la primera local `int` (3000) y `_L_` la segunda (3001); la constante 2 tiene una sola
-dirección (8000) en la función y en `main`; en `main` los temporales vuelven a empezar en 5000 y
+dirección (8000) en la función y en `main`, y una constante se muestra con el valor de la tabla (`2.50` aparece como `2.5`); en `main` los temporales vuelven a empezar en 5000 y
 6000 aunque su nombre siga (`t4`, `t5`). La fila completa y sus direcciones esperadas están en
 `src/test/resources/quads/valid/Q08_direcciones.bd`.
 
