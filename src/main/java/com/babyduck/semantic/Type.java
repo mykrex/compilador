@@ -21,7 +21,7 @@ public enum Type {
 
     /**
      * Convierte la palabra reservada del código fuente ("int", "float", "void") en su tipo.
-     * Se usará al recorrer {@code type} y {@code funcType} del árbol sintáctico.
+     * Se usa al recorrer {@code type} y {@code funcType} del árbol sintáctico.
      */
     public static Type fromKeyword(String keyword) {
         return switch (keyword) {

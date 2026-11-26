@@ -20,7 +20,7 @@ public final class QuadrupleQueue {
         SYMBOLIC,
         /**
          * Código del operador y direcciones virtuales, una línea por cuádruplo, sin encabezado:
-         * es lo que verá la máquina virtual. Lo usan las pruebas de direcciones
+         * es lo que usa la máquina virtual. Lo usan las pruebas de direcciones
          */
         ADDRESS,
         /** Tabla con encabezado para la consola; cada operando como dirección(nombre) */

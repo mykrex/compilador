@@ -9,13 +9,14 @@
 5. [Análisis semántico](05_semantica.md)
 6. [Código intermedio](06_codigo_intermedio.md)
 7. [Memoria virtual](07_memoria_virtual.md)
-8. [Testing](08_testing.md)
-9. [Herramientas de IA](09_herramientas_ia.md)
-10. **Guía de uso** (este capítulo)
+8. [Máquina virtual](08_maquina_virtual.md)
+9. [Testing](09_testing.md)
+10. [Herramientas de IA](10_herramientas_ia.md)
+11. **Guía de uso** (este capítulo)
 
 ---
 
-> **Alcance de la guía.** Describe lo que hace el compilador: revisar el léxico, la sintaxis y la semántica de un programa y generar su código intermedio (cuádruplos con direcciones virtuales).
+> **Alcance de la guía.** Describe lo que hace el compilador: revisar el léxico, la sintaxis y la semántica de un programa, generar su código intermedio (cuádruplos con direcciones virtuales) y ejecutarlo en la máquina virtual.
 
 Esta guía está pensada para alguien que quiere **escribir programas en BabyDuck**. Explica cómo se escribe un programa, qué reglas sigue el compilador, qué errores puede encontrar y cómo corregirlos. El porqué de cada regla está en los capítulos técnicos (por ejemplo, [Análisis Semántico](05_semantica.md)).
 
@@ -37,7 +38,7 @@ El compilador está hecho en Java 25 con ANTLR 4.13.2. Los programas se guardan 
 
 ---
 
-## Cómo compilar un programa
+## Cómo compilar y ejecutar un programa
 
 ### Desde IntelliJ
 
@@ -59,12 +60,12 @@ java -cp "target/classes:$(cat cp.txt)" com.babyduck.Main ejemplos/factorial.bd
 
 | Comando                     | Qué hace                                                                   |
 | --------------------------- | -------------------------------------------------------------------------- |
-| `Main programa.bd`          | Revisa el programa (léxico, sintaxis y semántica) y muestra sus cuádruplos |
+| `Main programa.bd`          | Revisa el programa (léxico, sintaxis y semántica), muestra sus cuádruplos y, si no hay errores, lo ejecuta |
 | `Main programa.bd --tokens` | Además, imprime la lista de tokens que encontró el analizador léxico       |
 
 ### Qué muestra el compilador
 
-**Si el programa es correcto**, imprime `Programa válido`, el árbol sintáctico, el directorio de funciones (las variables con su dirección y, por función, su inicio, sus parámetros y cuánta memoria usa), la fila de cuádruplos y la tabla de constantes (ver [Código intermedio](#código-intermedio)):
+**Si el programa es correcto**, imprime `Programa válido`, el árbol sintáctico, el directorio de funciones (las variables con su dirección y, por función, su inicio, sus parámetros y cuánta memoria usa), la fila de cuádruplos y la tabla de constantes (ver [Código intermedio](#código-intermedio)). Después **ejecuta** el programa en la sección `=== Ejecución ===`: ahí aparece lo que imprime con `print`, y cada `read` espera un dato en la consola (en IntelliJ, en la ventana Run), uno por línea:
 
 ```text
 Programa válido: ejemplos/factorial.bd
@@ -87,6 +88,10 @@ _Fact_ -> int (regreso en 1002)
 
 === Tabla de constantes ===
 ...
+
+=== Ejecución ===
+5
+factorial de 5 = 120
 ```
 
 **Si tiene errores**, los lista con su fase, línea y columna, y termina con código de salida 1:
@@ -97,7 +102,7 @@ Se encontraron 2 error(es) en programa.bd:
   [Error semántico] línea 9:8 -> no se puede asignar float a _X_, que es int
 ```
 
-El compilador revisa en tres fases. Si hay errores léxicos o sintácticos, **no** se hace la revisión semántica (primero hay que corregir la forma del programa). Dentro de cada fase se reportan todos los errores, en orden de línea. Si hay cualquier error, no se muestran cuádruplos.
+El compilador revisa en tres fases. Si hay errores léxicos o sintácticos, **no** se hace la revisión semántica (primero hay que corregir la forma del programa). Dentro de cada fase se reportan todos los errores, en orden de línea. Si hay cualquier error, no se muestran cuádruplos ni se ejecuta el programa.
 
 ---
 
@@ -467,11 +472,24 @@ Los errores léxicos y sintácticos los genera ANTLR y aparecen en inglés. Los 
 | `la función _F_ no regresa un valor en todos los caminos`            | Algún camino termina sin `return`                                                    | Agrega `else` con `return`, o un `return` al final |
 | `código inalcanzable: hay un return antes de este estatuto`          | Estatutos después de un `return`                                                     | Muévelos antes del `return` o elimínalos           |
 
+### Errores de ejecución (el programa compila pero falla al ejecutarse)
+
+Detienen el programa con el número del cuádruplo donde ocurrieron, por ejemplo `Error de ejecución en el cuádruplo 3: división entre cero`, y terminan con código de salida 1. Lo que se imprimió antes del error se conserva.
+
+| Mensaje                                           | Causa                                                            | Corrección                                              |
+| ------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------- |
+| `división entre cero`                             | El divisor vale 0                                                | Revisa el divisor con un `if` antes de dividir          |
+| `la dirección 1001 no tiene valor`                | Se usa una variable antes de asignarle un valor                  | Asígnale un valor (o léelo con `read`) antes de usarla  |
+| `se esperaba un int y se leyó "2.5"`              | El dato escrito en la consola no corresponde al tipo de la variable | Escribe un entero para `int`; un número para `float` |
+| `no hay más datos de entrada`                     | Un `read` no recibió dato                                        | Escribe un dato por cada `read`                         |
+| `el int "99999999999" está fuera de rango`        | El entero leído no cabe en `int`                                 | Usa un número entre `-2147483648` y `2147483647`        |
+| `se excedió el límite de 10000 llamadas anidadas` | Recursión sin caso base (o demasiado profunda)                   | Revisa que la función tenga un caso que no se llame a sí misma |
+
 ---
 
 ## Ejemplos de programas válidos
 
-Todos estos programas pasan las tres fases del compilador.
+Todos estos programas pasan las tres fases del compilador. Debajo de cada uno está lo que imprime al ejecutarse.
 
 ### Factorial recursivo
 
@@ -498,6 +516,8 @@ main {
 end
 ```
 
+Con la entrada `5` imprime `factorial de 5 = 120`.
+
 ### Fibonacci iterativo
 
 ```
@@ -520,6 +540,8 @@ main {
 }
 end
 ```
+
+Con la entrada `10` imprime `fib(10) = 55`.
 
 ### Promedio con `float`, función `void` y bloque
 
@@ -559,6 +581,14 @@ main {
 end
 ```
 
+Imprime:
+
+```text
+promedio: 4.25
+¿mayor que 4? true
+valor negativo
+```
+
 Este ejemplo muestra:
 
 - Un `int` pasado a un parámetro `float`.
@@ -572,7 +602,7 @@ Este ejemplo muestra:
 
 ## Código intermedio
 
-Cuando el programa no tiene errores, el compilador muestra, después del directorio de funciones, la **fila de cuádruplos**: las instrucciones que ejecutará la máquina virtual. Cada renglón es `(operador, izquierdo, derecho, resultado)` y cada operando aparece como `dirección(nombre)`; los `t1`, `t2`… son resultados intermedios que crea el compilador y `_` indica un campo vacío. El cuádruplo 0 siempre salta al inicio de `main`. Al final aparece la tabla de constantes (cada valor distinto, con su dirección).
+Cuando el programa no tiene errores, el compilador muestra, después del directorio de funciones, la **fila de cuádruplos**: las instrucciones que ejecuta la máquina virtual. Cada renglón es `(operador, izquierdo, derecho, resultado)` y cada operando aparece como `dirección(nombre)`; los `t1`, `t2`… son resultados intermedios que crea el compilador y `_` indica un campo vacío. El cuádruplo 0 siempre salta al inicio de `main`. Al final aparece la tabla de constantes (cada valor distinto, con su dirección).
 
 Con `var _A_, _B_, _C_, _X_ : int;`:
 
@@ -596,7 +626,7 @@ print("x = ", _X_);
 10000  string  "x = "
 ```
 
-Los `if` y `while` generan saltos (`GOTOF` si la condición es falsa, `GOTO` incondicional) y las llamadas generan `ERA`, `PARAM` y `GOSUB`; el detalle está en [Código intermedio](06_codigo_intermedio.md) y la distribución de direcciones en [Memoria virtual](07_memoria_virtual.md).
+Los `if` y `while` generan saltos (`GOTOF` si la condición es falsa, `GOTO` incondicional) y las llamadas generan `ERA`, `PARAM` y `GOSUB`; el detalle está en [Código intermedio](06_codigo_intermedio.md), la distribución de direcciones en [Memoria virtual](07_memoria_virtual.md) y cómo se ejecutan en [Máquina virtual](08_maquina_virtual.md).
 
 ---
 
@@ -645,4 +675,4 @@ end
 
 ## Navegación
 
-- Anterior: [← Herramientas de IA](09_herramientas_ia.md)
+- Anterior: [← Herramientas de IA](10_herramientas_ia.md)

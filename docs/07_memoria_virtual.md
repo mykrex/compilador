@@ -9,9 +9,10 @@
 5. [Análisis semántico](05_semantica.md)
 6. [Código intermedio](06_codigo_intermedio.md)
 7. **Memoria virtual** (este capítulo)
-8. [Testing](08_testing.md)
-9. [Herramientas de IA](09_herramientas_ia.md)
-10. [Guía de uso](10_guia_de_uso.md)
+8. [Máquina virtual](08_maquina_virtual.md)
+9. [Testing](09_testing.md)
+10. [Herramientas de IA](10_herramientas_ia.md)
+11. [Guía de uso](11_guia_de_uso.md)
 
 ---
 
@@ -19,8 +20,8 @@
 
 Cada variable, temporal y constante recibe una **dirección virtual** en el momento en que se
 crea, y los cuádruplos guardan esas direcciones (además del nombre, que solo sirve para leer la
-salida). La dirección dice en qué segmento y de qué tipo es el valor; la máquina virtual la usará
-para encontrarlo en su memoria.
+salida). La dirección dice en qué segmento y de qué tipo es el valor; la máquina virtual la usa
+para encontrarlo en su memoria (ver [Máquina virtual](08_maquina_virtual.md)).
 
 | Clase | Paquete | Qué hace |
 |---|---|---|
@@ -60,7 +61,7 @@ la fábrica de operandos de `QuadrupleGenerator` (`variable`, `constant`, `strin
 | Constante o letrero | Constante | La primera vez que aparece su valor |
 
 - **Locales y temporales se reinician** al empezar cada función y `main`: cada función usa sus
-  direcciones desde la base, porque cada llamada tendrá su propia memoria. Globales y constantes
+  direcciones desde la base, porque cada llamada tiene su propia memoria. Globales y constantes
   no se reinician. El nombre de los temporales (`t1`, `t2`…) sigue un solo contador en todo el
   programa, para que la fila se lea sin ambigüedad.
 - **Constantes sin repetir:** la tabla guarda `valor → dirección` por tipo, con el valor ya
@@ -119,4 +120,4 @@ dirección (8000) en la función y en `main`, y una constante se muestra con el 
 ## Navegación
 
 - Anterior: [← Código intermedio](06_codigo_intermedio.md)
-- Siguiente: [Testing →](08_testing.md)
+- Siguiente: [Máquina virtual →](08_maquina_virtual.md)

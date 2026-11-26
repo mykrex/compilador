@@ -12,9 +12,10 @@
 5. [Análisis semántico](05_semantica.md)
 6. [Código intermedio](06_codigo_intermedio.md)
 7. [Memoria virtual](07_memoria_virtual.md)
-8. [Testing](08_testing.md)
-9. [Herramientas de IA](09_herramientas_ia.md)
-10. [Guía de uso](10_guia_de_uso.md)
+8. [Máquina virtual](08_maquina_virtual.md)
+9. [Testing](09_testing.md)
+10. [Herramientas de IA](10_herramientas_ia.md)
+11. [Guía de uso](11_guia_de_uso.md)
 
 ---
 
@@ -22,7 +23,7 @@
 
 Este proyecto implementa un compilador para **BabyDuck**, un mini-lenguaje imperativo con variables enteras y flotantes, funciones con parámetros, condiciones, ciclos y entrada/salida.
 
-El compilador se desarrolla en **Java** y usa **ANTLR4** para generar automáticamente el analizador léxico (Scanner) y el analizador sintáctico (Parser) a partir de un archivo de gramática. Sobre el árbol de parseo, un solo recorrido valida la semántica, asigna las direcciones virtuales y genera el código intermedio (cuádruplos).
+El compilador se desarrolla en **Java** y usa **ANTLR4** para generar automáticamente el analizador léxico (Scanner) y el analizador sintáctico (Parser) a partir de un archivo de gramática. Sobre el árbol de parseo, un solo recorrido valida la semántica, asigna las direcciones virtuales y genera el código intermedio (cuádruplos). Si el programa no tiene errores, la máquina virtual ejecuta esos cuádruplos en la misma corrida.
 
 ## Tecnologías
 
@@ -42,13 +43,15 @@ flowchart LR
     B -->|tokens| C[BabyDuckParser<br/>Parser]
     C -->|árbol de parseo| D[SemanticAnalyzer<br/>semántica + direcciones + cuádruplos]
     D --> F[Directorio de funciones,<br/>fila de cuádruplos y<br/>tabla de constantes]
+    F --> G[VirtualMachine<br/>ejecución]
     B -.->|errores léxicos| E[ErrorCollector]
     C -.->|errores sintácticos| E
     D -.->|errores semánticos| E
 ```
 
 La semántica solo corre si no hubo errores léxicos ni sintácticos; si encuentra errores, la fila
-de cuádruplos se descarta.
+de cuádruplos se descarta y no se ejecuta nada. La máquina virtual solo recibe códigos de
+operación, direcciones, la tabla de constantes y los tamaños e inicios del directorio.
 
 ## Estructura del proyecto
 
@@ -65,13 +68,15 @@ compilador/
     │       ├── ErrorCollector.java          Recolecta errores léxicos, sintácticos y semánticos
     │       ├── SemanticAnalyzer.java        Recorrido del árbol: puntos neurálgicos
     │       ├── semantic/                    Tipos, cubo semántico, tablas y directorio de funciones
-    │       └── intermediate/                Cuádruplos, pilas, fila y memoria virtual
+    │       ├── intermediate/                Cuádruplos, pilas, fila y memoria virtual
+    │       └── vm/                          Máquina virtual y memoria de ejecución
     └── test/
-        ├── java/com/babyduck/               Pruebas JUnit por fase (y semantic/, intermediate/)
+        ├── java/com/babyduck/               Pruebas JUnit por fase (y semantic/, intermediate/, vm/)
         └── resources/
             ├── sintaxis/                    Programas .bd de sintaxis (valid/ e invalid/)
             ├── semantic/                    Programas .bd de semántica
-            └── quads/                       Programas .bd con su fila de cuádruplos esperada
+            ├── quads/                       Programas .bd con su fila de cuádruplos esperada
+            └── vm/                          Programas .bd con su salida o error de ejecución esperado
 ```
 
 Las clases `BabyDuckLexer`, `BabyDuckParser`, `BabyDuckListener` y `BabyDuckVisitor` **no se escriben a mano**: el plugin de Maven las genera desde `BabyDuck.g4` en cada compilación, dentro de `target/generated-sources/antlr4/`.
@@ -89,7 +94,7 @@ Para analizar un programa (en IntelliJ, como _Program arguments_ de `Main`):
 <archivo.bd> [--tokens]
 ```
 
-- Sin `--tokens`: si el programa es válido imprime el árbol de parseo, el directorio de funciones, la fila de cuádruplos y la tabla de constantes; si no, lista los errores.
+- Sin `--tokens`: si el programa es válido imprime el árbol de parseo, el directorio de funciones, la fila de cuádruplos y la tabla de constantes, y después lo ejecuta (sección `=== Ejecución ===`, donde `read` lee de la consola); si no, lista los errores. Un error de ejecución detiene el programa con su mensaje.
 - Con `--tokens`: además imprime la lista de tokens reconocidos.
 
 ## Avance por entrega
@@ -101,6 +106,7 @@ Para analizar un programa (en IntelliJ, como _Program arguments_ de `Main`):
 | 2       | Cubo semántico, directorio de funciones y tablas de variables     | ✓      |
 | 3       | Cuádruplos de expresiones y estatutos lineales                    | ✓      |
 | 4       | Saltos, funciones y direcciones virtuales                         | ✓      |
+| 5       | Máquina virtual y memoria de ejecución                            | ✓      |
 
 ---
 

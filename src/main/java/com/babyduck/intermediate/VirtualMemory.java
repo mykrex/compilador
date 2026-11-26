@@ -22,7 +22,7 @@ import java.util.Set;
  * Cada (segmento, tipo) tiene un contador: la siguiente dirección libre es base + contador
  *
  * Al empezar cada función y main, {@link #startScope()} reinicia los contadores locales y
- * temporales: cada función usa sus direcciones desde la base, porque cada llamada tendrá su
+ * temporales: cada función usa sus direcciones desde la base, porque cada llamada tiene su
  * propia memoria. Los globales y las constantes no se reinician
  *
  * Si un rango se llena no se lanza excepción (es un error del programa, no del compilador):

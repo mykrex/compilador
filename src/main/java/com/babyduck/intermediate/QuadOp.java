@@ -6,11 +6,11 @@ import com.babyduck.semantic.Op;
  * Operadores de los cuádruplos (instrucciones del código intermedio)
  *
  * Es un enum aparte de {@link Op}: Op son los operadores del lenguaje que consulta
- * el cubo semántico; QuadOp son las instrucciones que ejecutará la máquina virtual
+ * el cubo semántico; QuadOp son las instrucciones que ejecuta la máquina virtual
  *
  * Cada operador tiene un código numérico fijo, escrito a mano (no se usa ordinal(),
  * que cambiaría si alguien reordena el enum). En memoria el cuádruplo guarda el enum;
- * el código se usará al escribir el archivo que lee la máquina virtual
+ * la máquina virtual elige qué hacer según el código
  */
 public enum QuadOp {
     PLUS(1, "+"),

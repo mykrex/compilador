@@ -9,9 +9,10 @@
 5. [Análisis semántico](05_semantica.md)
 6. **Código intermedio** (este capítulo)
 7. [Memoria virtual](07_memoria_virtual.md)
-8. [Testing](08_testing.md)
-9. [Herramientas de IA](09_herramientas_ia.md)
-10. [Guía de uso](10_guia_de_uso.md)
+8. [Máquina virtual](08_maquina_virtual.md)
+9. [Testing](09_testing.md)
+10. [Herramientas de IA](10_herramientas_ia.md)
+11. [Guía de uso](11_guia_de_uso.md)
 
 ---
 
@@ -79,7 +80,7 @@ Operaciones principales: `pushOperand`, `popOperand`, `pushOperator`, `pushFakeB
 `startLoopBody`, `endLoop`; funciones: `startProgram`, `startMain`, `emitEra`, `emitParam`,
 `emitGosub`, `emitCallResult`, `emitReturn`, `emitEndFunc`. `format(Style)` tiene tres estilos:
 `FULL` (consola, cada operando como `dirección(nombre)`), `SYMBOLIC` (solo nombres) y `ADDRESS`
-(códigos y direcciones, lo que verá la máquina virtual); las pruebas usan los dos últimos.
+(códigos y direcciones, lo que usa la máquina virtual); las pruebas usan los dos últimos.
 
 **Errores.** Toda expresión deja un operando en la pila, aunque sea `Operand.ERROR`; un operando de
 error no genera mensajes ni cuádruplos (sin errores en cadena). El generador detecta y regresa un
@@ -196,7 +197,7 @@ end
 
 La fila esperada de cada programa de prueba (Q01–Q10) está dentro de su archivo en
 `src/test/resources/quads/valid/`, en nombres y, en los más recientes, también en direcciones
-(ver [Testing](08_testing.md)).
+(ver [Testing](09_testing.md)).
 
 ## Cambios respecto a la entrega anterior
 

@@ -9,9 +9,10 @@
 5. [Análisis semántico](05_semantica.md)
 6. [Código intermedio](06_codigo_intermedio.md)
 7. [Memoria virtual](07_memoria_virtual.md)
-8. [Testing](08_testing.md)
-9. **Herramientas de IA** (este capítulo)
-10. [Guía de uso](10_guia_de_uso.md)
+8. [Máquina virtual](08_maquina_virtual.md)
+9. [Testing](09_testing.md)
+10. **Herramientas de IA** (este capítulo)
+11. [Guía de uso](11_guia_de_uso.md)
 
 ---
 
@@ -88,9 +89,29 @@ corrieron en IntelliJ (120, 122 y 123 pruebas, sin fallas) y se hizo el commit a
 | Puntos neurálgicos      | Propuesta de la numeración secuencial con su tabla de equivalencias; diagramas nuevos (`<CONDITION>`, `<CYCLE>`, `<F_Call>`, `<Return>`) en `.drawio`, conservando las ediciones hechas a mano | Correcciones a la tabla: el punto de condición se comparte entre `if` y `while`, la revisión de todos los caminos se queda donde la hace el código, y el código inalcanzable queda como regla sin número; exportación de las imágenes                           |
 | Documentación           | Borradores de memoria virtual, código intermedio, semántica, testing y este registro                                                                                                           | Revisión y edición final                                                                                                                                                                                                                                        |
 
+## Entrega 5: Máquina virtual y memoria de ejecución
+
+**Herramienta:** Claude Code (Anthropic), modelo Opus 5.5, dentro del editor
+
+**Forma de trabajo.** Las mismas reglas que en la entrega 4. La herramienta revisó lo que pide la
+entrega y lo que ya estaba preparado en el repositorio, y propuso un plan por bloques (datos para la
+máquina virtual, memoria de ejecución, máquina virtual, pruebas de ejecución y documentación). El
+plan se aprobó con ajustes propios. Al terminar cada bloque, las pruebas se corrieron en IntelliJ
+(124, 129, 129 y 139 pruebas, sin fallas) antes de seguir.
+
+| Actividad                 | Uso de la IA                                                                                                                                                       | Trabajo propio / verificación                                                                                                                                                                                         |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Diseño de la ejecución    | Opciones para escribir o no un archivo intermedio                                                                                                                  | Decisión: una sola corrida sin archivo intermedio, y la regla de que la máquina virtual solo usa códigos, direcciones, la tabla de constantes y los tamaños e inicios del directorio, nunca nombres                    |
+| Operandos sin nombres     | Detección de que `ERA`, `GOSUB`, `PARAM` y los saltos dependían de nombres o de `k`; opciones para resolverlo                                                      | Elección de llevar números en la fila con direcciones (inicio de la función y dirección del parámetro); actualización del pseudocódigo y del diagrama de la llamada                                                   |
+| Valores sin asignar       | Opciones: error de ejecución o valor 0 por defecto                                                                                                                 | Diseño propio: error de ejecución, con arreglos primitivos y un `BitSet` por arreglo que marca las casillas con valor                                                                                                |
+| Memoria de ejecución      | Generación de `MemoryBlock`, `ActivationRecord`, `ExecutionMemory`, `RuntimeError` y de la tabla única de rangos en `VirtualMemory`                                | Verificación, con búsquedas en el código, de que el paquete `vm` no repite números de rangos y traduce solo con `rangeOf` y `cellOf`                                                                                  |
+| Máquina virtual           | Generación de `VirtualMachine` (ciclo con `switch` por código) y de su integración en `Main`                                                                       | Corrección del plan: `PRINT` sin espacio automático, como se decidió en la entrega 3; decisión de las secuencias de escape que se interpretan (`\n`, `\t`, `\"`, `\\`) y de documentarlas                            |
+| Pruebas                   | `ExecutionMemoryTest`, `VirtualMachineTest` y programas de ejecución con su salida esperada, calculada a mano antes de ejecutarlos                                 | Revisión de los casos y ejecución en IntelliJ                                                                                                                                                                         |
+| Documentación             | Borrador del capítulo de máquina virtual (mapa de memoria, métodos de acceso, traducción de direcciones, ejemplo paso a paso), renumeración de capítulos y actualización de testing, guía de uso, overview y este registro | Elección de mermaid para el mapa de memoria; revisión y edición final                                                                                                                                                 |
+
 ---
 
 ## Navegación
 
-- Anterior: [← Testing](08_testing.md)
-- Siguiente: [Guía de uso →](10_guia_de_uso.md)
+- Anterior: [← Testing](09_testing.md)
+- Siguiente: [Guía de uso →](11_guia_de_uso.md)

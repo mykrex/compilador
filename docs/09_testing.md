@@ -9,9 +9,10 @@
 5. [Análisis semántico](05_semantica.md)
 6. [Código intermedio](06_codigo_intermedio.md)
 7. [Memoria virtual](07_memoria_virtual.md)
-8. **Testing** (este capítulo)
-9. [Herramientas de IA](09_herramientas_ia.md)
-10. [Guía de uso](10_guia_de_uso.md)
+8. [Máquina virtual](08_maquina_virtual.md)
+9. **Testing** (este capítulo)
+10. [Herramientas de IA](10_herramientas_ia.md)
+11. [Guía de uso](11_guia_de_uso.md)
 
 ---
 
@@ -25,6 +26,7 @@ Las pruebas validan por separado cada fase implementada:
 | Sintáctica        | `ParserTest.java`                                                                | Que un programa completo se acepte sin errores, o que produzca un error sintáctico                                                                                                              |
 | Semántica         | `SemanticCubeTest`, `VariableTableTest`, `FunctionDirectoryTest`, `SemanticTest` | Estructuras semánticas y programas válidos o con un error semántico (casos en [Análisis semántico: Pruebas](05_semantica.md#pruebas))                                                           |
 | Código intermedio | `QuadrupleGeneratorTest`, `VirtualMemoryTest`, `QuadrupleTest`                   | Pilas, saltos, fila y tipos de los temporales; direcciones virtuales; fila de cuádruplos de programas completos ([Casos de prueba de código intermedio](#casos-de-prueba-de-código-intermedio)) |
+| Ejecución         | `ExecutionMemoryTest`, `VirtualMachineTest`                                      | Traducción de direcciones y registros de activación; salida o error de ejecución de programas completos ([Casos de prueba de ejecución](#casos-de-prueba-de-ejecución))                       |
 
 Criterios:
 
@@ -42,7 +44,7 @@ mvn test
 Resultado esperado (todas las fases):
 
 ```
-Tests run: 123, Failures: 0, Errors: 0, Skipped: 0
+Tests run: 139, Failures: 0, Errors: 0, Skipped: 0
 BUILD SUCCESS
 ```
 
@@ -161,7 +163,7 @@ end
 
 ## Casos de prueba de código intermedio
 
-- `QuadrupleGeneratorTest`: pilas y fila sin el parser (algoritmo con y sin fondo falso, asociatividad, tipo de cada temporal, errores por las pilas, signo, asignación, límites de constantes, códigos de operadores, saltos de un `while` con `if-else`, formatos de impresión).
+- `QuadrupleGeneratorTest`: pilas y fila sin el parser (algoritmo con y sin fondo falso, asociatividad, tipo de cada temporal, errores por las pilas, signo, asignación, límites de constantes, códigos de operadores, saltos de un `while` con `if-else`, formatos de impresión, y `ERA`/`PARAM`/`GOSUB` con nombres o con números según el estilo).
 - `VirtualMemoryTest`: base de cada segmento y tipo, reinicio de locales y temporales por función, rango lleno reportado una vez, constantes con el mismo valor en la misma dirección, nombre único de los temporales y rechazo de una variable sin dirección.
 - `FunctionDirectoryTest`: al liberar la tabla local se conservan parámetros con dirección, inicio y tamaños.
 - `QuadrupleTest`, sobre `src/test/resources/quads/`:
@@ -190,9 +192,35 @@ _X_ = _A_ * (_B_ + _C_);        // en Q01
 | Q09 | `if` sin `else`, `if-else` y `while` con un `if` anidado: cada `GOTOF`/`GOTO` con su destino                                                   | ✓         |
 | Q10 | Factorial recursivo con `return` anticipado, `f(5) + f(3)`, llamada anidada `f(g(1))` y función con valor como estatuto                        | ✓         |
 
+## Casos de prueba de ejecución
+
+- `ExecutionMemoryTest`: dirección → segmento, tipo y casilla; constantes cargadas en su dirección; casilla sin valor; cada llamada con sus propias locales y temporales (y los de `main` intactos al regresar); límite de llamadas anidadas.
+- `VirtualMachineTest`, sobre `src/test/resources/vm/`: compila cada programa y lo ejecuta en la máquina virtual.
+  - **Válidos:** la salida es igual al bloque `// salida:` del archivo, línea por línea (`//` sola es una línea vacía). Si el programa usa `read`, los datos están en el bloque `// entrada:`, uno por línea.
+  - **Inválidos:** se detiene con el mensaje completo de la línea `// esperado:`, incluido el número de cuádruplo.
+
+```
+print("5! = ", _Fact_(5));      // en V05
+// salida:
+// 5! = 120
+```
+
+| ID  | Qué valida                                                                                                                         | Resultado |
+| --- | ---------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| V01 | Precedencia, paréntesis, signo, `/` que siempre da `float` y promoción `float ← int`                                               | ✓         |
+| V02 | `while` con acumulador, `if-else` anidado dentro de un ciclo, ciclo que no entra e `if` sin `else`                                 | ✓         |
+| V03 | `read` de `int` y de `float` (un entero leído en un `float` se promueve)                                                           | ✓         |
+| V04 | Funciones `void` y con valor, variable local, promoción en el argumento, global modificada, llamada anidada y dos llamadas en una expresión | ✓  |
+| V05 | Factorial y Fibonacci recursivos, `return` anticipado en una función `void` recursiva                                              | ✓         |
+| V06 | Varios elementos sin espacio automático, `float`, `bool` y las secuencias `\n`, `\t`, `\"`, `\\` y otra letra                 | ✓         |
+| E01 | División entre cero                                                                                                                | ✓         |
+| E02 | Variable global que nunca recibió valor                                                                                            | ✓         |
+| E03 | `read` de un `int` que recibe `2.5`                                                                                                | ✓         |
+| E04 | Recursión sin caso base: límite de llamadas anidadas                                                                               | ✓         |
+
 ---
 
 ## Navegación
 
-- Anterior: [← Memoria virtual](07_memoria_virtual.md)
-- Siguiente: [Herramientas de IA →](09_herramientas_ia.md)
+- Anterior: [← Máquina virtual](08_maquina_virtual.md)
+- Siguiente: [Herramientas de IA →](10_herramientas_ia.md)
