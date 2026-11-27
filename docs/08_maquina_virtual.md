@@ -51,7 +51,7 @@ Al crear la máquina se prepara todo antes del primer cuádruplo:
 
 ## Mapa de memoria de ejecución
 
-<img src="diagramas/mapa_memoria_ejecucion.png" alt="mapa_memoria_ejecucion" width="500">
+<img src="diagramas/mapa_memoria_ejecucion.png" alt="mapa_memoria_ejecucion" width="100%">
 
 Cada bloque (`MemoryBlock`) tiene un arreglo primitivo por tipo (`int[]`, `double[]`,
 `boolean[]` y, solo en constantes, `String[]`) del tamaño exacto guardado en el directorio. Cada
