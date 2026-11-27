@@ -28,14 +28,14 @@ consulta nombres de variables ni tablas de símbolos. Por eso la fila con direcc
 números en los operandos que no son memoria: `ERA` y `GOSUB` llevan el inicio de la función,
 `PARAM` la dirección local del parámetro y los saltos el número de cuádruplo.
 
-| Clase | Paquete | Qué hace |
-|---|---|---|
-| `VirtualMachine` | `vm` | Carga el programa y ejecuta el ciclo de cuádruplos (unidad de ejecución y control, entrada y salida) |
-| `ExecutionMemory` | `vm` | Administrador de memoria: traduce una dirección a su casilla; pila de llamadas |
-| `ActivationRecord` | `vm` | Memoria de una llamada: locales, temporales y cuádruplo de regreso |
-| `MemoryBlock` | `vm` | Casillas de un segmento: un arreglo por tipo y una marca de casillas con valor |
-| `RuntimeError` | `vm` | Error del programa durante la ejecución |
-| `VirtualMemory` | `intermediate` | Tabla de rangos: dirección → segmento, tipo y casilla (la misma que usa el compilador) |
+| Clase              | Paquete        | Qué hace                                                                                             |
+| ------------------ | -------------- | ---------------------------------------------------------------------------------------------------- |
+| `VirtualMachine`   | `vm`           | Carga el programa y ejecuta el ciclo de cuádruplos (unidad de ejecución y control, entrada y salida) |
+| `ExecutionMemory`  | `vm`           | Administrador de memoria: traduce una dirección a su casilla; pila de llamadas                       |
+| `ActivationRecord` | `vm`           | Memoria de una llamada: locales, temporales y cuádruplo de regreso                                   |
+| `MemoryBlock`      | `vm`           | Casillas de un segmento: un arreglo por tipo y una marca de casillas con valor                       |
+| `RuntimeError`     | `vm`           | Error del programa durante la ejecución                                                              |
+| `VirtualMemory`    | `intermediate` | Tabla de rangos: dirección → segmento, tipo y casilla (la misma que usa el compilador)               |
 
 ## Carga
 
@@ -51,22 +51,7 @@ Al crear la máquina se prepara todo antes del primer cuádruplo:
 
 ## Mapa de memoria de ejecución
 
-```mermaid
-flowchart TB
-    subgraph FIJA["Memoria fija (toda la ejecución)"]
-        G["Global<br/>int[ ] · float[ ]<br/>variables globales y direcciones de regreso"]
-        C["Constantes<br/>int[ ] · float[ ] · letrero[ ]<br/>cargadas antes de ejecutar"]
-    end
-    subgraph PILA["Pila de registros de activación"]
-        direction TB
-        R2["Cima: llamada actual<br/>locales: int[ ] · float[ ]<br/>temporales: int[ ] · float[ ] · bool[ ]<br/>cuádruplo de regreso"]
-        R1["Llamada anterior<br/>locales · temporales · regreso"]
-        M["main<br/>temporales: int[ ] · float[ ] · bool[ ]"]
-        R2 --- R1 --- M
-    end
-    P["Registro pendiente<br/>lo crea ERA, lo llenan los PARAM<br/>GOSUB lo mete a la pila"]
-    P -. GOSUB .-> R2
-```
+<img src="diagramas/mapa_memoria_ejecucion.png" alt="mapa_memoria_ejecucion" width="500">
 
 Cada bloque (`MemoryBlock`) tiene un arreglo primitivo por tipo (`int[]`, `double[]`,
 `boolean[]` y, solo en constantes, `String[]`) del tamaño exacto guardado en el directorio. Cada
@@ -75,15 +60,15 @@ casilla y leer una casilla sin marca es un error de ejecución.
 
 ## Métodos de acceso
 
-| Método de `ExecutionMemory` | Para qué |
-|---|---|
-| `typeOf(dirección)` | Tipo del valor, según el rango de la dirección |
-| `readInt`, `readFloat`, `readBool`, `readString` | Leer el valor de una dirección; `readFloat` sobre una dirección `int` lo promueve |
-| `writeInt`, `writeFloat`, `writeBool` | Escribir en una dirección (las constantes no se escriben) |
-| `prepareCall(locales, temporales)` | `ERA`: crea el registro pendiente del tamaño de la función |
-| `writeParam(dirParámetro, dirArgumento)` | `PARAM`: lee el argumento en la memoria actual y lo escribe en el registro pendiente |
-| `enterCall(regreso)` | `GOSUB`: guarda el cuádruplo de regreso y mete el registro pendiente a la pila |
-| `exitCall()` | `RETURN` y `ENDFUNC`: saca el registro de la cima y da el cuádruplo de regreso |
+| Método de `ExecutionMemory`                      | Para qué                                                                             |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------ |
+| `typeOf(dirección)`                              | Tipo del valor, según el rango de la dirección                                       |
+| `readInt`, `readFloat`, `readBool`, `readString` | Leer el valor de una dirección; `readFloat` sobre una dirección `int` lo promueve    |
+| `writeInt`, `writeFloat`, `writeBool`            | Escribir en una dirección (las constantes no se escriben)                            |
+| `prepareCall(locales, temporales)`               | `ERA`: crea el registro pendiente del tamaño de la función                           |
+| `writeParam(dirParámetro, dirArgumento)`         | `PARAM`: lee el argumento en la memoria actual y lo escribe en el registro pendiente |
+| `enterCall(regreso)`                             | `GOSUB`: guarda el cuádruplo de regreso y mete el registro pendiente a la pila       |
+| `exitCall()`                                     | `RETURN` y `ENDFUNC`: saca el registro de la cima y da el cuádruplo de regreso       |
 
 ## Cómo una dirección indexa la memoria
 
@@ -96,13 +81,13 @@ La traducción usa la misma tabla de rangos con la que el compilador asignó las
    **cima** de la pila (la llamada que se está ejecutando).
 4. **Arreglo:** el tipo elige el arreglo del bloque y la casilla, la posición.
 
-| Dirección | Rango | Bloque | Casilla |
-|---|---|---|---|
-| 1001 | global `int` | global | `int[1]` |
-| 3000 | local `int` | locales de la cima | `int[0]` |
-| 6002 | temporal `float` | temporales de la cima | `float[2]` |
-| 7000 | temporal `bool` | temporales de la cima | `bool[0]` |
-| 10000 | constante letrero | constantes | `letrero[0]` |
+| Dirección | Rango             | Bloque                | Casilla      |
+| --------- | ----------------- | --------------------- | ------------ |
+| 1001      | global `int`      | global                | `int[1]`     |
+| 3000      | local `int`       | locales de la cima    | `int[0]`     |
+| 6002      | temporal `float`  | temporales de la cima | `float[2]`   |
+| 7000      | temporal `bool`   | temporales de la cima | `bool[0]`    |
+| 10000     | constante letrero | constantes            | `letrero[0]` |
 
 Como local y temporal se resuelven con la cima, la misma dirección (por ejemplo 3000) es una
 casilla distinta en cada llamada; así funciona la recursión sin que una llamada pise a otra.
@@ -112,34 +97,34 @@ casilla distinta en cada llamada; así funciona la recursión sin que una llamad
 El ciclo empieza en el cuádruplo 0: lee el cuádruplo, ejecuta según su código (`switch`) y pasa al
 siguiente, o al que indique un salto, hasta `END`.
 
-| Código | Qué hace |
-|---|---|
-| 1–3 `+ - *` | Si el resultado es `int` opera con enteros; si es `float`, con flotantes |
-| 4 `/` | Siempre da `float`; dividir entre cero es error de ejecución |
-| 5–8 `> < == !=` | Compara y deja `true` o `false` en un temporal `bool` |
-| 9 `=` | Copia el valor; un destino `float` acepta un valor `int` |
-| 10 `UMINUS` | Cambia el signo |
-| 11 `PRINT` | Imprime el elemento, sin espacio ni salto de línea |
-| 12 `PRINTLN` | Salto de línea |
-| 13 `READ` | Lee una línea y la guarda según el tipo de la variable |
-| 14 `END` | Termina |
-| 15 `GOTO` | Salta al cuádruplo indicado |
-| 16 `GOTOF` | Salta si la condición es `false` |
-| 17 `ERA` | Crea el registro pendiente con el tamaño de la función (buscada por su inicio) |
-| 18 `PARAM` | Copia el argumento a la dirección del parámetro en el registro pendiente |
-| 19 `GOSUB` | Guarda el cuádruplo siguiente como regreso, activa el registro y salta al inicio |
-| 20 `RETURN` | Copia el valor a la dirección global de regreso (si la función tiene valor), borra el registro y regresa |
-| 21 `ENDFUNC` | Borra el registro y regresa |
+| Código          | Qué hace                                                                                                 |
+| --------------- | -------------------------------------------------------------------------------------------------------- |
+| 1–3 `+ - *`     | Si el resultado es `int` opera con enteros; si es `float`, con flotantes                                 |
+| 4 `/`           | Siempre da `float`; dividir entre cero es error de ejecución                                             |
+| 5–8 `> < == !=` | Compara y deja `true` o `false` en un temporal `bool`                                                    |
+| 9 `=`           | Copia el valor; un destino `float` acepta un valor `int`                                                 |
+| 10 `UMINUS`     | Cambia el signo                                                                                          |
+| 11 `PRINT`      | Imprime el elemento, sin espacio ni salto de línea                                                       |
+| 12 `PRINTLN`    | Salto de línea                                                                                           |
+| 13 `READ`       | Lee una línea y la guarda según el tipo de la variable                                                   |
+| 14 `END`        | Termina                                                                                                  |
+| 15 `GOTO`       | Salta al cuádruplo indicado                                                                              |
+| 16 `GOTOF`      | Salta si la condición es `false`                                                                         |
+| 17 `ERA`        | Crea el registro pendiente con el tamaño de la función (buscada por su inicio)                           |
+| 18 `PARAM`      | Copia el argumento a la dirección del parámetro en el registro pendiente                                 |
+| 19 `GOSUB`      | Guarda el cuádruplo siguiente como regreso, activa el registro y salta al inicio                         |
+| 20 `RETURN`     | Copia el valor a la dirección global de regreso (si la función tiene valor), borra el registro y regresa |
+| 21 `ENDFUNC`    | Borra el registro y regresa                                                                              |
 
 **Impresión:** un `float` se imprime con su punto decimal (`2.5`, `3.0`) y un `bool` como `true` o
 `false`. En los letreros se interpretan cuatro secuencias:
 
-| Secuencia | Se imprime |
-|---|---|
-| `\n` | salto de línea |
-| `\t` | tabulador |
-| `\"` | comilla doble |
-| `\\` | diagonal invertida |
+| Secuencia | Se imprime         |
+| --------- | ------------------ |
+| `\n`      | salto de línea     |
+| `\t`      | tabulador          |
+| `\"`      | comilla doble      |
+| `\\`      | diagonal invertida |
 
 Cualquier otro carácter después de `\` se imprime tal cual, sin la diagonal.
 
@@ -151,14 +136,14 @@ además parte decimal (un entero leído en un `float` se promueve).
 Un error detiene la máquina con el número del cuádruplo donde ocurrió, por ejemplo
 `Error de ejecución en el cuádruplo 3: división entre cero`.
 
-| Error | Mensaje |
-|---|---|
-| División entre cero | `división entre cero` |
-| Usar una casilla que nunca recibió valor | `la dirección 1001 no tiene valor` |
-| Dato de `read` que no corresponde al tipo | `se esperaba un int y se leyó "2.5"` |
-| `read` sin más datos | `no hay más datos de entrada` |
-| `int` leído fuera de rango | `el int "99999999999" está fuera de rango` |
-| Recursión sin fin | `se excedió el límite de 10000 llamadas anidadas` |
+| Error                                     | Mensaje                                           |
+| ----------------------------------------- | ------------------------------------------------- |
+| División entre cero                       | `división entre cero`                             |
+| Usar una casilla que nunca recibió valor  | `la dirección 1001 no tiene valor`                |
+| Dato de `read` que no corresponde al tipo | `se esperaba un int y se leyó "2.5"`              |
+| `read` sin más datos                      | `no hay más datos de entrada`                     |
+| `int` leído fuera de rango                | `el int "99999999999" está fuera de rango`        |
+| Recursión sin fin                         | `se excedió el límite de 10000 llamadas anidadas` |
 
 ## Ejemplo
 

@@ -1,0 +1,106 @@
+<mxfile host="app.diagrams.net">
+  <diagram id="mapa" name="Mapa de memoria de ejecución">
+    <mxGraphModel dx="1098" dy="1535" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="m1" parent="1" style="text;html=0;fillColor=none;strokeColor=none;fontColor=#000000;fontStyle=1;fontSize=18;align=left;verticalAlign=middle;fontFamily=Arial;" value="Mapa de memoria de ejecución" vertex="1">
+          <mxGeometry height="30" width="400" x="10" y="-10" as="geometry" />
+        </mxCell>
+        <mxCell id="m2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.6;fontFamily=Arial;fontSize=14;fontStyle=1;fontColor=#000000;verticalAlign=top;align=left;spacingLeft=8;spacingTop=2;" value="Memoria fija (toda la ejecución)" vertex="1">
+          <mxGeometry height="300" width="360" x="10" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="m3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.2;fontFamily=Arial;fontSize=13;fontStyle=1;fontColor=#000000;verticalAlign=top;align=left;spacingLeft=6;spacingTop=1;" value="Global: variables globales y direcciones de regreso" vertex="1">
+          <mxGeometry height="120" width="320" x="30" y="73" as="geometry" />
+        </mxCell>
+        <mxCell id="m4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontFamily=Arial;fontSize=13;fontColor=#000000;align=left;spacingLeft=6;" value="int[ ]  ·  1000–1999" vertex="1">
+          <mxGeometry height="28" width="300" x="40" y="121" as="geometry" />
+        </mxCell>
+        <mxCell id="m5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontFamily=Arial;fontSize=13;fontColor=#000000;align=left;spacingLeft=6;" value="float[ ]  ·  2000–2999" vertex="1">
+          <mxGeometry height="28" width="300" x="40" y="153" as="geometry" />
+        </mxCell>
+        <mxCell id="m6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.2;fontFamily=Arial;fontSize=13;fontStyle=1;fontColor=#000000;verticalAlign=top;align=left;spacingLeft=6;spacingTop=1;" value="Constantes: cargadas antes de ejecutar" vertex="1">
+          <mxGeometry height="130" width="320" x="30" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="m7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontFamily=Arial;fontSize=13;fontColor=#000000;align=left;spacingLeft=6;" value="int[ ]  ·  8000–8999" vertex="1">
+          <mxGeometry height="28" width="300" x="40" y="230" as="geometry" />
+        </mxCell>
+        <mxCell id="m8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontFamily=Arial;fontSize=13;fontColor=#000000;align=left;spacingLeft=6;" value="float[ ]  ·  9000–9999" vertex="1">
+          <mxGeometry height="28" width="300" x="40" y="262" as="geometry" />
+        </mxCell>
+        <mxCell id="m9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontFamily=Arial;fontSize=13;fontColor=#000000;align=left;spacingLeft=6;" value="letrero[ ]  ·  10000–10999" vertex="1">
+          <mxGeometry height="28" width="300" x="40" y="294" as="geometry" />
+        </mxCell>
+        <mxCell id="m10" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;fontFamily=Arial;fontSize=13;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;spacingRight=6;" value="Cada arreglo es primitivo (int[ ], double[ ], boolean[ ], String[ ]) y mide lo que guarda el directorio de funciones.&lt;br&gt;&lt;br&gt;Cada arreglo tiene un &lt;b&gt;BitSet&lt;/b&gt;: escribir marca la casilla; leer una casilla sin marca es un error de ejecución." vertex="1">
+          <mxGeometry height="100" width="380" x="10" y="392" as="geometry" />
+        </mxCell>
+        <mxCell id="m11" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.6;fontFamily=Arial;fontSize=14;fontStyle=1;fontColor=#000000;verticalAlign=top;align=left;spacingLeft=8;spacingTop=2;" value="Pila de registros de activación" vertex="1">
+          <mxGeometry height="620" width="380" x="410" y="-10" as="geometry" />
+        </mxCell>
+        <mxCell id="m12" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=2.2;fontFamily=Arial;fontSize=13;fontStyle=1;fontColor=#000000;verticalAlign=top;align=left;spacingLeft=8;spacingTop=2;" value="Cima: llamada actual (guarda su cuádruplo de regreso)" vertex="1">
+          <mxGeometry height="310" width="340" x="430" y="25" as="geometry" />
+        </mxCell>
+        <mxCell id="m13" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.2;fontFamily=Arial;fontSize=13;fontStyle=1;fontColor=#000000;verticalAlign=top;align=left;spacingLeft=6;spacingTop=1;" value="Locales (parámetros primero)" vertex="1">
+          <mxGeometry height="100" width="310" x="445" y="78" as="geometry" />
+        </mxCell>
+        <mxCell id="m14" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontFamily=Arial;fontSize=13;fontColor=#000000;align=left;spacingLeft=6;" value="int[ ]  ·  3000–3999" vertex="1">
+          <mxGeometry height="28" width="290" x="455" y="109" as="geometry" />
+        </mxCell>
+        <mxCell id="m15" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=light-dark(#0050EF,#27314D);strokeColor=#001DBC;strokeWidth=2;fontFamily=Arial;fontSize=13;fontColor=#ffffff;align=left;spacingLeft=6;" value="float[ ]  ·  4000–4999" vertex="1">
+          <mxGeometry height="28" width="290" x="455" y="137" as="geometry" />
+        </mxCell>
+        <mxCell id="m16" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.2;fontFamily=Arial;fontSize=13;fontStyle=1;fontColor=#000000;verticalAlign=top;align=left;spacingLeft=6;spacingTop=1;" value="Temporales" vertex="1">
+          <mxGeometry height="120" width="310" x="445" y="194" as="geometry" />
+        </mxCell>
+        <mxCell id="m17" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontFamily=Arial;fontSize=13;fontColor=#000000;align=left;spacingLeft=6;" value="int[ ]  ·  5000–5999" vertex="1">
+          <mxGeometry height="28" width="290" x="455" y="221" as="geometry" />
+        </mxCell>
+        <mxCell id="m18" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontFamily=Arial;fontSize=13;fontColor=#000000;align=left;spacingLeft=6;" value="float[ ]  ·  6000–6999" vertex="1">
+          <mxGeometry height="28" width="290" x="455" y="251" as="geometry" />
+        </mxCell>
+        <mxCell id="m19" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontFamily=Arial;fontSize=13;fontColor=#000000;align=left;spacingLeft=6;" value="bool[ ]  ·  7000–7999" vertex="1">
+          <mxGeometry height="28" width="290" x="455" y="281" as="geometry" />
+        </mxCell>
+        <mxCell id="m20" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.6;fontFamily=Arial;fontSize=13;fontStyle=1;fontColor=#000000;verticalAlign=top;align=left;spacingLeft=8;spacingTop=2;" value="Llamada anterior" vertex="1">
+          <mxGeometry height="90" width="340" x="430" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="m21" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontFamily=Arial;fontSize=13;fontColor=#000000;align=left;spacingLeft=6;" value="locales · temporales · cuádruplo de regreso" vertex="1">
+          <mxGeometry height="40" width="310" x="445" y="392" as="geometry" />
+        </mxCell>
+        <mxCell id="m22" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.6;fontFamily=Arial;fontSize=13;fontStyle=1;fontColor=#000000;verticalAlign=top;align=left;spacingLeft=8;spacingTop=2;" value="main (fondo de la pila)" vertex="1">
+          <mxGeometry height="125" width="340" x="430" y="465" as="geometry" />
+        </mxCell>
+        <mxCell id="m23" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontFamily=Arial;fontSize=13;fontColor=#000000;align=left;spacingLeft=6;" value="Temporales: int[ ] · float[ ] · bool[ ]" vertex="1">
+          <mxGeometry height="32" width="310" x="445" y="497" as="geometry" />
+        </mxCell>
+        <mxCell id="m24" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1;fontFamily=Arial;fontSize=13;fontColor=#000000;align=left;spacingLeft=6;" value="Sin locales: main usa las globales" vertex="1">
+          <mxGeometry height="32" width="310" x="445" y="539" as="geometry" />
+        </mxCell>
+        <mxCell id="m25" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.6;fontFamily=Arial;fontSize=14;fontStyle=1;fontColor=#000000;verticalAlign=top;align=left;spacingLeft=8;spacingTop=2;dashed=1;" value="Registro pendiente (entre ERA y GOSUB)" vertex="1">
+          <mxGeometry height="190" width="320" x="880" y="-53" as="geometry" />
+        </mxCell>
+        <mxCell id="m26" parent="1" style="text;html=1;whiteSpace=wrap;fillColor=none;strokeColor=none;fontColor=#000000;align=left;verticalAlign=top;fontFamily=Arial;fontSize=13;spacingLeft=4;" value="&lt;b&gt;ERA&lt;/b&gt; (prepareCall): lo crea con el tamaño de la función, buscada por su inicio.&lt;br&gt;&lt;br&gt;&lt;b&gt;PARAM&lt;/b&gt; (writeParam): lee el argumento en la memoria actual y lo escribe en la dirección del parámetro.&lt;br&gt;&lt;br&gt;&lt;b&gt;GOSUB&lt;/b&gt; (enterCall): guarda el cuádruplo de regreso y lo mete a la pila." vertex="1">
+          <mxGeometry height="160" width="300" x="890" y="-25" as="geometry" />
+        </mxCell>
+        <mxCell id="m27" edge="1" parent="1" source="m25" style="endArrow=block;endFill=1;endSize=5;html=1;rounded=0;strokeColor=#000000;strokeWidth=1.4;fontFamily=Arial;fontSize=13;labelBackgroundColor=#FFFFFF;exitX=0;exitY=0.75;exitDx=0;exitDy=0;entryX=1;entryY=0.2;entryDx=0;entryDy=0;" target="m12" value="GOSUB">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m28" parent="1" style="rounded=1;arcSize=8;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;fontColor=#000000;fontFamily=Arial;fontSize=13;align=left;verticalAlign=top;spacingLeft=8;spacingTop=6;spacingRight=6;" value="&lt;b&gt;RETURN / ENDFUNC&lt;/b&gt; (exitCall): se borra la cima y se regresa al cuádruplo guardado; RETURN antes copia el valor a la dirección global de regreso." vertex="1">
+          <mxGeometry height="80" width="320" x="880" y="250" as="geometry" />
+        </mxCell>
+        <mxCell id="m29" edge="1" parent="1" source="m12" style="endArrow=block;endFill=1;endSize=5;html=1;rounded=0;strokeColor=#000000;strokeWidth=1.4;fontFamily=Arial;fontSize=13;labelBackgroundColor=#FFFFFF;exitX=1;exitY=0.85;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" target="m28" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="m30" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#000000;strokeWidth=1.6;fontFamily=Arial;fontSize=14;fontStyle=1;fontColor=#000000;verticalAlign=top;align=left;spacingLeft=8;spacingTop=2;" value="Cómo una dirección indexa la memoria" vertex="1">
+          <mxGeometry height="199" width="320" x="880" y="350" as="geometry" />
+        </mxCell>
+        <mxCell id="m31" parent="1" style="text;html=1;whiteSpace=wrap;fillColor=none;strokeColor=none;fontColor=#000000;align=left;verticalAlign=top;fontFamily=Arial;fontSize=13;spacingLeft=4;" value="1. &lt;b&gt;rango&lt;/b&gt; = dirección / 1000 → segmento y tipo (VirtualMemory.rangeOf)&lt;br&gt;2. &lt;b&gt;casilla&lt;/b&gt; = dirección − base (VirtualMemory.cellOf)&lt;br&gt;3. global y constante: bloque fijo; local y temporal: registro de la &lt;b&gt;cima&lt;/b&gt;&lt;br&gt;4. el tipo elige el arreglo y la casilla, la posición&lt;br&gt;&lt;b style=&quot;color: light-dark(rgb(0, 127, 255), rgb(0, 127, 255));&quot;&gt;&lt;br&gt;&lt;font&gt;Ejemplo: 4001&lt;/font&gt;&lt;/b&gt; → rango 4 = local float → cima, float[1]" vertex="1">
+          <mxGeometry height="169" width="300" x="890" y="380" as="geometry" />
+        </mxCell>
+        <mxCell id="m32" edge="1" parent="1" source="m30" style="endArrow=block;endFill=1;endSize=5;html=1;rounded=0;strokeColor=#001DBC;strokeWidth=2.2;exitX=0;exitY=0.85;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;edgeStyle=orthogonalEdgeStyle;fillColor=#0050ef;" target="m15" value="">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
